@@ -34,6 +34,7 @@ void Loot::drop(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	}
 }
 
+
 // HEALER
 
 Healer::Healer(float amt) : amt(amt) {}
@@ -46,8 +47,11 @@ bool Healer::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) 
 	return false;
 }
 
+
 // DAMAGE SPELL
+
 DamageSpell::DamageSpell(float range, float dmg) : range(range), dmg(dmg) {}
+
 
 // LIGHTNING BOLT
 
@@ -62,18 +66,19 @@ bool LightningBolt::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> b
 	return Loot::use(owner, bearer);
 }
 
+
 // FIREBALL
 
-Fireball::Fireball(float range, float dmg) : DamageSpell(range, dmg) {}
+Fireball::Fireball(float range, float dmg, float radius) : DamageSpell(range, dmg), radius(radius) {}
 
 bool Fireball::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	engine.gui->message(TCODColor::cyan, "Left-click to cast fireball,\nor right-click to cancel.");
 	int x, y;
-	if(!engine.pickTile(&x, &y, 8)) { return false; } // fix hard-code # eventually
-	engine.gui->message(TCODColor::flame, "The fireball explodes burning everything in %g radius!", range);
+	if(!engine.pickTile(&x, &y, range, radius)) { return false; }
+	engine.gui->message(TCODColor::flame, "The fireball explodes burning everything in radius %g!", radius);
 	for(auto & ent : engine.entityList) {
 		if(ent->mortal) {
-			if(!ent->mortal->isDead() && ent->getDistance(x, y) <= range) {
+			if(!ent->mortal->isDead() && ent->getDistance(x, y) <= radius) {
 				engine.gui->message(TCODColor::flame, "The %s is burned by the fireball for %g damage!", ent->name, dmg);
 				ent->mortal->takeDamage(ent, dmg);
 			}

@@ -21,7 +21,7 @@ public:
 	std::shared_ptr<Entity> getClosestMonster(int x, int y, float range) const;
 	std::shared_ptr<Entity> getMonster(int x, int y) const;
 
-	bool pickTile(int * x, int * y, float maxRange = 0.0f);
+	bool pickTile(int * x, int * y, float maxRange = 0.0f, float radius = 0.0f);
 
 	void update();
 	void render();
@@ -30,6 +30,8 @@ public:
 private:
 	bool computeFov;
 	std::vector<std::shared_ptr<Entity>> deadEntities;
+
+	static float getDistance(int x1, int y1, int x2, int y2);
 
 	void handleDeadEntities();
 };

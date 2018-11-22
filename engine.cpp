@@ -44,15 +44,20 @@ std::shared_ptr<Entity> Engine::getMonster(int x, int y) const {
 	return NULL;
 }
 
-bool Engine::pickTile(int * x, int * y, float maxRange) {
+bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 	while(!TCODConsole::isWindowClosed()) {
 		render();
 		for(int cx = 0; cx < dungeon->w; ++cx) {
 			for(int cy = 0; cy < dungeon->h; ++cy) {
 				if(dungeon->isInFov(cx, cy) && (maxRange == 0 || player->getDistance(cx, cy) <= maxRange)) {
-					TCODColor col = TCODConsole::root->getCharBackground(cx, cy); 
-					col = col*1.2f;
-					TCODConsole::root->setCharBackground(cx, cy, col);
+					if(getDistance(cx, cy, mouse.cx, mouse.cy) <= radius) {
+						TCODConsole::root->setCharBackground(cx, cy, TCODColor::flame);
+					}
+					else {
+						TCODColor col = TCODConsole::root->getCharBackground(cx, cy);
+						col = col*1.2f;
+						TCODConsole::root->setCharBackground(cx, cy, col);
+					}
 				}
 			}
 		}
@@ -92,6 +97,12 @@ void Engine::render() {
 
 void Engine::notifyDeath(std::shared_ptr<Entity> entity) {
 	deadEntities.emplace_back(entity);
+}
+
+float Engine::getDistance(int x1, int y1, int x2, int y2) {
+	int dx = x1 - x2;
+	int dy = y1 - y2;
+	return sqrtf(dx*dx + dy*dy);
 }
 
 void Engine::handleDeadEntities() {

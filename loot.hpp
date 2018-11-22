@@ -29,6 +29,7 @@ public:
 
 class Fireball : public DamageSpell {
 public:
-	Fireball(float range, float dmg);
+	float radius;
+	Fireball(float range, float dmg, float radius);
 	bool use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };

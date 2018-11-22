@@ -158,7 +158,7 @@ void Map::addItem(int x, int y) {
 	}
 	else if(lDice<70 + 10 + 10) {
 		std::shared_ptr<Entity> fBallScroll = std::make_shared<Entity>(x, y, "Fireball Scroll", '#',  TCODColor::flame);
-		fBallScroll->blocks = false; fBallScroll->loot = std::make_shared<Fireball>(3, 12);
+		fBallScroll->blocks = false; fBallScroll->loot = std::make_shared<Fireball>(8, 12, 3);
 		engine.entityList.push_back(fBallScroll);
 	}
 	else {

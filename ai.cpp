@@ -12,8 +12,10 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 		default: break;
 		}
 		if(dx != 0 || dy != 0) {
-			engine.gameState = Engine::TURN;
-			if(moveOrAttack(owner, owner->x + dx, owner->y + dy)) { engine.dungeon->computeFov(); }
+			if(moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
+				engine.dungeon->computeFov();
+				engine.gameState = Engine::TURN;
+			}
 		}
 	}
 }
@@ -29,6 +31,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 					if(ent->loot->collect(ent, owner)) {
 						found = true;
 						engine.gui->message(TCODColor::lightGrey, "You collect the %s.", lootName);
+						engine.gameState = Engine::TURN;
 						break;
 					}
 					else if(!found) {
@@ -38,15 +41,13 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 				}
 			}
 			if(!found) { engine.gui->message(TCODColor::lightGrey, "There's nothing here."); }
-			engine.gameState = Engine::TURN;
 		}
 		break;
 	case 'i': // Access inventory
 		{
 			std::shared_ptr<Entity> item = chooseFromInv(owner);
 			if(item) {
-				item->loot->use(item, owner);
-				engine.gameState = Engine::TURN;
+				if(item->loot->use(item, owner)) { engine.gameState = Engine::TURN; }
 			}
 		}
 		break;
