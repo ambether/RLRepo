@@ -90,7 +90,7 @@ void Map::addMonster(int x, int y) {
 		gobbo->mortal = std::make_shared<Mortal>(10, 0, "dead gobbo");
 		gobbo->combat = std::make_shared<Combat>(3);
 		gobbo->ai = std::make_shared<mobAi>();
-		engine.entityList.push_back(gobbo);
+		engine.entityList.push_back(gobbo); engine.activeEntities.push_back(gobbo);
 		//engine.entityList.emplace_back(std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen)); 
 	}
 	else {
@@ -98,7 +98,7 @@ void Map::addMonster(int x, int y) {
 		hobbo->mortal = std::make_shared<Mortal>(16, 1, "dead hobbo");
 		hobbo->combat = std::make_shared<Combat>(4);
 		hobbo->ai = std::make_shared<mobAi>();
-		engine.entityList.push_back(hobbo);
+		engine.entityList.push_back(hobbo); engine.activeEntities.push_back(hobbo);
 		//engine.entityList.emplace_back(std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange));
 	}
 }
@@ -149,17 +149,17 @@ void Map::addItem(int x, int y) {
 	if(lDice<70) {
 		std::shared_ptr<Entity> healPotion = std::make_shared<Entity>(x, y, "Healing Potion", '!',  TCODColor::crimson);
 		healPotion->blocks = false; healPotion->loot = std::make_shared<Healer>(4);
-		engine.entityList.push_back(healPotion);
+		engine.entityList.push_back(healPotion); engine.inactiveEntities.push_back(healPotion);
 	}
 	else if(lDice<70 + 10) {
 		std::shared_ptr<Entity> lBoltScroll = std::make_shared<Entity>(x, y, "Lightning Bolt Scroll", '#', TCODColor::azure);
 		lBoltScroll->blocks = false; lBoltScroll->loot = std::make_shared<LightningBolt>(5, 20);
-		engine.entityList.push_back(lBoltScroll);
+		engine.entityList.push_back(lBoltScroll); engine.inactiveEntities.push_back(lBoltScroll);
 	}
 	else if(lDice<70 + 10 + 10) {
 		std::shared_ptr<Entity> fBallScroll = std::make_shared<Entity>(x, y, "Fireball Scroll", '#',  TCODColor::flame);
 		fBallScroll->blocks = false; fBallScroll->loot = std::make_shared<Fireball>(8, 12, 3);
-		engine.entityList.push_back(fBallScroll);
+		engine.entityList.push_back(fBallScroll); engine.inactiveEntities.push_back(fBallScroll);
 	}
 	else {
 		//std::shared_ptr<Ent> ConfusionScroll = std::make_shared<Ent>(x, y, '#', "Confusion Scroll", TCODColor::lightGreen);

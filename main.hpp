@@ -6,7 +6,6 @@
 #include <functional>
 #include <cstdarg>
 #include <utility>
-#include <deque>
 
 #include "libtcod.hpp"
 

@@ -25,7 +25,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 	case 'c': // Collect item
 		{
 			bool found = false;
-			for(auto & ent : engine.entityList) {
+			for(auto & ent : engine.inactiveEntities) {
 				if(ent->loot && ent->x == owner->x && ent->y == owner->y) {
 					auto lootName = ent->name;
 					if(ent->loot->collect(ent, owner)) {
@@ -62,10 +62,9 @@ bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
 				owner->combat->attack(owner, ent);
 				return false;
 			}
-			else if (ent->mortal->isDead() && ent->x == tx && ent->y == ty) {
-				engine.gui->message(TCODColor::white, "There is a %s here.", ent->name);
-			}
+			else if(ent->x == tx && ent->y == ty) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 		}
+		else if(ent->x == tx && ent->y == ty) {	engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 	}
 	owner->x = tx;
 	owner->y = ty;
