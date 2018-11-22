@@ -11,18 +11,6 @@ Entity::Entity(int x, int y, const char * name, int ch, const TCODColor & col)
 	loot(nullptr),
 	container(nullptr) {}
 
-/* bool Entity::moveOrAttack(int x, int y) {
-	if(engine.dungeon->isWall(x, y)) return false;
-	for(auto & ent : engine.entityList) {
-		if(ent->x == x && ent->y == y) {
-			std::cout << "The " << ent->name << " memes on ya." << std::endl;
-			return false;
-		}
-	}
-	this->x = x; this->y = y;
-	return true;
-}*/
-
 void Entity::render() const {
 	TCODConsole::root->setChar(x, y, ch);
 	TCODConsole::root->setCharForeground(x, y, color);

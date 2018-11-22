@@ -81,7 +81,7 @@ void Gui::renderBar(int x, int y, int width,
 
 Gui::Message::Message(const char * text, const TCODColor & col) : text(_strdup(text)), col(col) {}
 
-Gui::Message::~Message() { free(text); }
+Gui::Message::~Message() { delete text; }
 
 void Gui::renderMouseLook() {
 	if(!engine.dungeon->isInFov(engine.mouse.cx, engine.mouse.cy)) { return; }

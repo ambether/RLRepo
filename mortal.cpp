@@ -30,8 +30,6 @@ float Mortal::heal(float amount) {
 pcMortal::pcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
 void pcMortal::die(std::shared_ptr<Entity> owner) {
-	// printf("You have been slain, nerd.\n");
-	// std::cout << "You have been slain nerd." << std::endl;
 	engine.gui->message(TCODColor::red, "You've been slain nerd.");
 	Mortal::die(owner);
 	engine.gameState = engine.LOSE;
@@ -40,8 +38,6 @@ void pcMortal::die(std::shared_ptr<Entity> owner) {
 npcMortal::npcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
 void npcMortal::die(std::shared_ptr<Entity> owner) {
-	// printf("The %s has perished like a nerd.\n", owner->name);
-	//std::cout << "The " << owner->name << " has perished like a nerd." << std::endl;
 	engine.gui->message(TCODColor::lightGrey, "The %s has perished like a nerd.", owner->name);
 	Mortal::die(owner);
 }

@@ -7,6 +7,8 @@ bool Loot::collect(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer
 	if(bearer->container && bearer->container->add(owner)) {
 		auto it = std::find(engine.entityList.begin(), engine.entityList.end(), owner);
 		engine.entityList.erase(it);
+		it = std::find(engine.inactiveEntities.begin(), engine.inactiveEntities.end(), owner);
+		engine.inactiveEntities.erase(it);
 		return true;
 	}
 	return false;
@@ -23,7 +25,7 @@ bool Loot::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 void Loot::drop(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	if(bearer->container) {
 		bearer->container->del(owner);
-		engine.entityList.push_back(owner);
+		engine.entityList.push_back(owner); engine.inactiveEntities.push_back(owner);
 		owner->x = bearer->x; owner->y = bearer->y;
 		if(bearer == engine.player) {
 			engine.gui->message(TCODColor::lightGrey, "You have dropped the %s", owner->name);
@@ -76,12 +78,10 @@ bool Fireball::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer
 	int x, y;
 	if(!engine.pickTile(&x, &y, range, radius)) { return false; }
 	engine.gui->message(TCODColor::flame, "The fireball explodes burning everything in radius %g!", radius);
-	for(auto & ent : engine.entityList) {
-		if(ent->mortal) {
-			if(!ent->mortal->isDead() && ent->getDistance(x, y) <= radius) {
-				engine.gui->message(TCODColor::flame, "The %s is burned by the fireball for %g damage!", ent->name, dmg);
-				ent->mortal->takeDamage(ent, dmg);
-			}
+	for(auto & ent : engine.activeEntities) {
+		if(ent->getDistance(x, y) <= radius) {
+			engine.gui->message(TCODColor::flame, "The %s is burned by the fireball for %g damage!", ent->name, dmg);
+			ent->mortal->takeDamage(ent, dmg);
 		}
 	}
 	return Loot::use(owner, bearer);

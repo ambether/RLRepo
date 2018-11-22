@@ -6,8 +6,11 @@ public:
 	TCOD_key_t lastKey;
 	TCOD_mouse_t mouse;
 
-	//std::vector<std::shared_ptr<Entity>> entityList;
-	std::deque<std::shared_ptr<Entity>> entityList;
+	std::vector<std::shared_ptr<Entity>> entityList;		// A list of all Entities in the game.
+	std::vector<std::shared_ptr<Entity>> activeEntities;	// It is assumed Entities in this list have Ai, Mortal, and are not dead.
+	std::vector<std::shared_ptr<Entity>> inactiveEntities;	// It is assumed Entities in this list do not have Ai or Mortal.
+	std::vector<std::shared_ptr<Entity>> deadEntities;		// Entities with Ai and Mortal, but are dead.
+
 	std::shared_ptr<Entity> player;
 	
 	int fovRadius;
@@ -29,7 +32,7 @@ public:
 
 private:
 	bool computeFov;
-	std::vector<std::shared_ptr<Entity>> deadEntities;
+	std::vector<std::shared_ptr<Entity>> deaths;
 
 	static float getDistance(int x1, int y1, int x2, int y2);
 
