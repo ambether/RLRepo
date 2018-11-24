@@ -89,7 +89,7 @@ void Map::addMonster(int x, int y) {
 		std::shared_ptr<Entity> gobbo = std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen);
 		gobbo->mortal = std::make_shared<Mortal>(10, 0, "dead gobbo");
 		gobbo->combat = std::make_shared<Combat>(3);
-		gobbo->ai = std::make_shared<mobAi>();
+		gobbo->ai = std::make_shared<mobAi>(50);
 		engine.entityList.push_back(gobbo); engine.activeEntities.push_back(gobbo);
 		//engine.entityList.emplace_back(std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen)); 
 	}
@@ -97,7 +97,7 @@ void Map::addMonster(int x, int y) {
 		std::shared_ptr<Entity> hobbo = std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange);
 		hobbo->mortal = std::make_shared<Mortal>(16, 1, "dead hobbo");
 		hobbo->combat = std::make_shared<Combat>(4);
-		hobbo->ai = std::make_shared<mobAi>();
+		hobbo->ai = std::make_shared<mobAi>(150);
 		engine.entityList.push_back(hobbo); engine.activeEntities.push_back(hobbo);
 		//engine.entityList.emplace_back(std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange));
 	}

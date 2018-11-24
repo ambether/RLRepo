@@ -19,5 +19,7 @@ public:
 
 	void render() const;
 	void update(std::shared_ptr<Entity> owner);
+	void gainEnergy();
+
 	float getDistance(int cx, int cy) const;
 };

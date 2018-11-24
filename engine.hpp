@@ -2,7 +2,7 @@
 
 class Engine {
 public:
-	enum gameState { START, IDLE, TURN, WIN, LOSE } gameState;
+	enum gameState { START, IDLE, TURN, NEW_TURN, WIN, LOSE } gameState;
 	TCOD_key_t lastKey;
 	TCOD_mouse_t mouse;
 
