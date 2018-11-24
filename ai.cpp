@@ -1,22 +1,33 @@
 #include "main.hpp"
 
+Ai::Ai(int speed) : speed(speed), energy(0) {}
+
+void Ai::gainEnergy() { energy += speed; }
+
+void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
+
+
+playerAi::playerAi() : Ai(100) {}
+
 void playerAi::update(std::shared_ptr<Entity> owner) {
 	if(owner->mortal && !owner->mortal->isDead()) {
-		int dx = 0, dy = 0;
-		switch(engine.lastKey.vk) {
-		case TCODK_UP:		dy = -1; break;
-		case TCODK_DOWN:	dy =  1; break;
-		case TCODK_LEFT:	dx = -1; break;
-		case TCODK_RIGHT:	dx =  1; break;
-		case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
-		default: break;
-		}
-		if(dx != 0 || dy != 0) {
-			if(moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
-				engine.dungeon->computeFov();
-				engine.gameState = Engine::TURN;
+		if(energy >= 100) {
+			int dx = 0, dy = 0;
+			switch(engine.lastKey.vk) {
+			case TCODK_UP:		dy = -1; break;
+			case TCODK_DOWN:	dy = 1; break;
+			case TCODK_LEFT:	dx = -1; break;
+			case TCODK_RIGHT:	dx = 1; break;
+			case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
+			default: break;
+			}
+			if(dx != 0 || dy != 0) {
+				if(moveOrAttack(owner, owner->x + dx, owner->y + dy)) { // only returns true if it moves the actor
+					engine.dungeon->computeFov();
+				}
 			}
 		}
+		if(energy < 100) engine.gameState = Engine::TURN;
 	}
 }
 
@@ -31,7 +42,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 					if(ent->loot->collect(ent, owner)) {
 						found = true;
 						engine.gui->message(TCODColor::lightGrey, "You collect the %s.", lootName);
-						engine.gameState = Engine::TURN;
+						spendEnergy();
 						break;
 					}
 					else if(!found) {
@@ -47,7 +58,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 		{
 			std::shared_ptr<Entity> item = chooseFromInv(owner);
 			if(item) {
-				if(item->loot->use(item, owner)) { engine.gameState = Engine::TURN; }
+				if(item->loot->use(item, owner)) { spendEnergy(); }
 			}
 		}
 		break;
@@ -56,6 +67,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 
 bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
 	if(engine.dungeon->isWall(tx, ty)) { return false; }
+	spendEnergy();
 	for(auto & ent : engine.entityList) {
 		if(ent->mortal) {
 			if(!ent->mortal->isDead() && ent->x == tx && ent->y == ty) {
@@ -101,15 +113,21 @@ std::shared_ptr<Entity> playerAi::chooseFromInv(std::shared_ptr<Entity> owner) {
 	return NULL;
 }
 
+
 static const int TRACK_TURNS(3);
+
+mobAi::mobAi(int speed) : Ai(speed) {}
 
 void mobAi::update(std::shared_ptr<Entity> owner) {
 	if(owner->mortal) {
 		if(owner->mortal->isDead()) { return; }
 	}
-	if(engine.dungeon->isInFov(owner->x, owner->y)) { moveCount = TRACK_TURNS; }
-	else { --moveCount; }
-	if(moveCount > 0) { moveOrAttack(owner, engine.player->x, engine.player->y); }
+	while(energy >= 100) {
+		if(engine.dungeon->isInFov(owner->x, owner->y)) { moveCount = TRACK_TURNS; }
+		else { --moveCount; }
+		if(moveCount > 0) { moveOrAttack(owner, engine.player->x, engine.player->y); }
+		spendEnergy();
+	}
 }
 
 void mobAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {

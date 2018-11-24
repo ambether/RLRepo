@@ -18,6 +18,8 @@ void Entity::render() const {
 
 void Entity::update(std::shared_ptr<Entity> owner) { if(ai) ai->update(owner); }
 
+void Entity::gainEnergy() { if(ai) ai->gainEnergy(); }
+
 float Entity::getDistance(int cx, int cy) const {
 	int dx = x - cx;
 	int dy = y - cy;

@@ -77,6 +77,11 @@ bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 
 void Engine::update() {
 	if(gameState == START) dungeon->computeFov();
+	if(gameState == NEW_TURN) {
+		for(auto ent : activeEntities) {
+			ent->gainEnergy();
+		}
+	}
 	gameState = IDLE;
 	TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS|TCOD_EVENT_MOUSE, &lastKey, &mouse);
 	player->update(player);
@@ -84,8 +89,9 @@ void Engine::update() {
 		for(auto & ent : activeEntities) {
 			if(ent->name != "player") { ent->update(ent); }
 		}
+		handleDeadEntities();
+		gameState = NEW_TURN;
 	}
-	handleDeadEntities();
 }
 
 void Engine::render() {
