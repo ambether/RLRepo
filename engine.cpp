@@ -89,6 +89,7 @@ void Engine::update() {
 		for(auto & ent : activeEntities) {
 			if(ent->name != "player") { ent->update(ent); }
 		}
+		actionQueue.processActions();
 		handleDeadEntities();
 		gameState = NEW_TURN;
 	}

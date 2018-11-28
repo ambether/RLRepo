@@ -31,7 +31,7 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 	}
 }
 
-void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
+void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TODO: make the use of/interaction with items part of the Action system.
 	switch(ascii) {
 	case 'c': // Collect item
 		{
@@ -71,15 +71,17 @@ bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
 	for(auto & ent : engine.entityList) {
 		if(ent->mortal) {
 			if(!ent->mortal->isDead() && ent->x == tx && ent->y == ty) {
-				owner->combat->attack(owner, ent);
+				//owner->combat->attack(owner, ent);
+				engine.actionQueue.addAction(std::make_shared<AttackAction>(owner, ent));
 				return false;
 			}
 			else if(ent->x == tx && ent->y == ty) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 		}
 		else if(ent->x == tx && ent->y == ty) {	engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 	}
-	owner->x = tx;
-	owner->y = ty;
+	//owner->x = tx;
+	//owner->y = ty;
+	engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, tx, ty));
 	return true;
 }
 
@@ -139,9 +141,13 @@ void mobAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
 	if(distance >= 2) {
 		dx = (int)(round(dx / distance));
 		dy = (int)(round(dy / distance));
-		if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) { owner->x += dx; owner->y += dy; }
-		else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) { owner->x += sdx; }
-		else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) { owner->y += sdy; }
+		//if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) { owner->x += dx; owner->y += dy; }
+		//else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) { owner->x += sdx; }
+		//else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) { owner->y += sdy; }
+		if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x+dx, owner->y+ dy)); }
+		else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x + sdx, owner->y)); }
+		else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x, owner->y + sdy)); }
 	}
-	else if(owner->combat) { owner->combat->attack(owner, engine.player); }
+	//else if(owner->combat) { owner->combat->attack(owner, engine.player); }
+	else if(owner->combat) { engine.actionQueue.addAction(std::make_shared<AttackAction>(owner, engine.player)); }
 }

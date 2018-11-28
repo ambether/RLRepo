@@ -7,7 +7,6 @@ public:
 	void gainEnergy();
 protected:
 	int speed, energy;
-
 	void spendEnergy();
 };
 
