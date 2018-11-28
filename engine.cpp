@@ -118,6 +118,7 @@ void Engine::handleDeadEntities() {
 	for(auto & ent : deaths) {
 		auto pos = std::find(activeEntities.begin(), activeEntities.end(), ent);
 		if(pos != activeEntities.end()) {
+			ent->mortal->die(ent);
 			activeEntities.erase(pos);
 			deadEntities.push_back(ent);
 		}
