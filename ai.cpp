@@ -2,7 +2,9 @@
 
 Ai::Ai(int speed) : speed(speed), energy(0) {}
 
-void Ai::gainEnergy() { energy += speed; }
+void Ai::gainEnergy() { 
+	energy += speed; 
+}
 
 void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
 
@@ -15,16 +17,14 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 			int dx = 0, dy = 0;
 			switch(engine.lastKey.vk) {
 			case TCODK_UP:		dy = -1; break;
-			case TCODK_DOWN:	dy = 1; break;
+			case TCODK_DOWN:	dy =  1; break;
 			case TCODK_LEFT:	dx = -1; break;
-			case TCODK_RIGHT:	dx = 1; break;
+			case TCODK_RIGHT:	dx =  1; break;
 			case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
 			default: break;
 			}
 			if(dx != 0 || dy != 0) {
-				if(moveOrAttack(owner, owner->x + dx, owner->y + dy)) { // only returns true if it moves the actor
-					engine.dungeon->computeFov();
-				}
+				if(moveOrAttack(owner, dx, dy)) { engine.dungeon->computeFov(); } // only returns true if it moves the Entity
 			}
 		}
 		if(energy < 100) engine.gameState = Engine::TURN;
@@ -65,23 +65,10 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 	}
 }
 
-bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
-	if(engine.dungeon->isWall(tx, ty)) { return false; }
+bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int dx, int dy) {
+	if(engine.dungeon->isWall(owner->x + dx, owner->y + dy)) { return false; }
 	spendEnergy();
-	for(auto & ent : engine.entityList) {
-		if(ent->mortal) {
-			if(!ent->mortal->isDead() && ent->x == tx && ent->y == ty) {
-				//owner->combat->attack(owner, ent);
-				engine.actionQueue.addAction(std::make_shared<AttackAction>(owner, ent));
-				return false;
-			}
-			else if(ent->x == tx && ent->y == ty) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
-		}
-		else if(ent->x == tx && ent->y == ty) {	engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
-	}
-	//owner->x = tx;
-	//owner->y = ty;
-	engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, tx, ty));
+	engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, dx, dy));
 	return true;
 }
 
@@ -121,33 +108,23 @@ static const int TRACK_TURNS(3);
 mobAi::mobAi(int speed) : Ai(speed) {}
 
 void mobAi::update(std::shared_ptr<Entity> owner) {
-	if(owner->mortal) {
-		if(owner->mortal->isDead()) { return; }
-	}
+	if(owner->mortal && owner->mortal->isDead()) { return; }
+
 	while(energy >= 100) {
 		if(engine.dungeon->isInFov(owner->x, owner->y)) { moveCount = TRACK_TURNS; }
 		else { --moveCount; }
-		if(moveCount > 0) { moveOrAttack(owner, engine.player->x, engine.player->y); }
-		spendEnergy();
+
+		if(moveCount > 0) {	moveOrAttack(owner); }
+		else { idle(owner); }
 	}
 }
 
-void mobAi::moveOrAttack(std::shared_ptr<Entity> owner, int tx, int ty) {
-	int dx = tx - owner->x,
-		dy = ty - owner->y,
-		sdx = (dx > 0 ? 1 : -1), 
-		sdy = (dy > 0 ? 1 : -1), 
-		distance((int)sqrt(dx*dx + dy*dy));
-	if(distance >= 2) {
-		dx = (int)(round(dx / distance));
-		dy = (int)(round(dy / distance));
-		//if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) { owner->x += dx; owner->y += dy; }
-		//else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) { owner->x += sdx; }
-		//else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) { owner->y += sdy; }
-		if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x+dx, owner->y+ dy)); }
-		else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x + sdx, owner->y)); }
-		else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) { engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, owner->x, owner->y + sdy)); }
-	}
-	//else if(owner->combat) { owner->combat->attack(owner, engine.player); }
-	else if(owner->combat) { engine.actionQueue.addAction(std::make_shared<AttackAction>(owner, engine.player)); }
+void mobAi::moveOrAttack(std::shared_ptr<Entity> owner) {
+	spendEnergy();
+	engine.actionQueue.addAction(std::make_shared<MoveAtPlayerAction>(owner));
+}
+
+void mobAi::idle(std::shared_ptr<Entity> owner) {
+	spendEnergy();
+	engine.actionQueue.addAction(std::make_shared<IdleAction>(owner));
 }

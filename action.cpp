@@ -1,10 +1,59 @@
 #include "main.hpp"
 
-MoveAction::MoveAction(std::shared_ptr<Entity> owner, int tx, int ty) : owner(owner), tx(tx), ty(ty) {}
+Action::ActionResult::ActionResult(std::shared_ptr<Action> alternate) : alternate(alternate) {}
 
-void MoveAction::execute() { owner->x = tx; owner->y = ty; }
+
+MoveAction::MoveAction(std::shared_ptr<Entity> owner, int dx, int dy) : owner(owner), dx(dx), dy(dy) {}
+
+Action::ActionResult MoveAction::execute() {
+	for(auto & ent : engine.entityList) {
+		if(ent->mortal) {
+			if(!ent->mortal->isDead() && ent->x == owner->x+dx && ent->y == owner->y+dy) {
+				if(owner != engine.player && ent != engine.player) return ActionResult();
+				return ActionResult(std::make_shared<AttackAction>(owner, ent));
+			}
+			else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
+		}
+		else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
+	}
+	owner->x += dx; owner->y += dy;
+	return ActionResult();
+}
 
 
 AttackAction::AttackAction(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target) : attacker(attacker), target(target) {}
 
-void AttackAction::execute() { attacker->combat->attack(attacker, target); }
+Action::ActionResult AttackAction::execute() { 
+	attacker->combat->attack(attacker, target); 
+	return ActionResult(); 
+}
+
+
+IdleAction::IdleAction(std::shared_ptr<Entity> owner) : owner(owner) {}
+
+Action::ActionResult IdleAction::execute() { return ActionResult(); }
+
+
+MoveAtPlayerAction::MoveAtPlayerAction(std::shared_ptr<Entity> owner) : owner(owner) {}
+
+Action::ActionResult MoveAtPlayerAction::execute() {
+	int dx = engine.player->x - owner->x,
+		dy = engine.player->y - owner->y,
+		sdx = (dx > 0 ? 1 : -1),
+		sdy = (dy > 0 ? 1 : -1),
+		distance((int)sqrt(dx*dx + dy*dy));
+	if(distance >= 2) {
+		dx = (int)(round(dx / distance));
+		dy = (int)(round(dy / distance));
+		if(engine.dungeon->canWalk(owner->x + dx, owner->y + dy)) {
+			return ActionResult(std::make_shared<MoveAction>(owner, dx, dy));
+		}
+		else if(engine.dungeon->canWalk(owner->x + sdx, owner->y)) {
+			return ActionResult(std::make_shared<MoveAction>(owner, sdx, 0));
+		}
+		else if(engine.dungeon->canWalk(owner->x, owner->y + sdy)) {
+			return ActionResult(std::make_shared<MoveAction>(owner, 0, sdy));
+		}
+	}
+	else if(distance == 1 && owner->combat) { return ActionResult(std::make_shared<AttackAction>(owner, engine.player)); }
+}
