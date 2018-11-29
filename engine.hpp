@@ -11,6 +11,8 @@ public:
 	std::vector<std::shared_ptr<Entity>> inactiveEntities;	// It is assumed Entities in this list do not have Ai or Mortal.
 	std::vector<std::shared_ptr<Entity>> deadEntities;		// Entities with Ai and Mortal, but are dead.
 
+	ActionQueue actionQueue;
+
 	std::shared_ptr<Entity> player;
 	
 	int fovRadius;

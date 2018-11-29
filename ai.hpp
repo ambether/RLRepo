@@ -7,7 +7,6 @@ public:
 	void gainEnergy();
 protected:
 	int speed, energy;
-
 	void spendEnergy();
 };
 
@@ -27,5 +26,6 @@ public:
 	void update(std::shared_ptr<Entity> owner);
 protected:
 	int moveCount;
-	void moveOrAttack(std::shared_ptr<Entity> owner, int tX, int tY);
+	void moveOrAttack(std::shared_ptr<Entity> owner);
+	void idle(std::shared_ptr<Entity> owner);
 };

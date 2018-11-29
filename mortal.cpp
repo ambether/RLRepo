@@ -6,7 +6,7 @@ float Mortal::takeDamage(std::shared_ptr<Entity> owner, float dmg) {
 	dmg -= def;
 	if(dmg > 0) {
 		hp -= dmg;
-		if(hp <= 0) { die(owner); }
+		if(hp <= 0) { engine.notifyDeath(owner); }
 	}
 	else { dmg = 0; }
 	return dmg;
@@ -16,9 +16,7 @@ void Mortal::die(std::shared_ptr<Entity> owner) {
 	owner->ch = '%';
 	owner->color = TCODColor::darkRed;
 	owner->name = corpseName;
-	owner->blocks = false;
-	
-	engine.notifyDeath(owner); // Tells the engine that this entity has died and should be rendered under living entities
+	owner->blocks = false;	
 }
 
 float Mortal::heal(float amount) {
