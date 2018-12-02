@@ -2,8 +2,8 @@
 
 class Loot {
 public:
-	bool collect(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> wearer);
-	virtual bool use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> wearer);
+	bool collect(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
+	virtual bool use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void drop(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };
 

@@ -2,7 +2,6 @@
 
 // Probably want to change a lot of the "use" methods. Seems wrong to send messages to gui from here.
 
-
 bool Loot::collect(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	if(bearer->container && bearer->container->add(owner)) {
 		auto it = std::find(engine.entityList.begin(), engine.entityList.end(), owner);
