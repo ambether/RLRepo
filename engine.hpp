@@ -31,6 +31,7 @@ public:
 	void update();
 	void render();
 	void notifyDeath(std::shared_ptr<Entity> entity);
+	void addAction(std::shared_ptr<Action> action);
 
 private:
 	bool computeFov;

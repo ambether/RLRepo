@@ -56,4 +56,5 @@ Action::ActionResult MoveAtPlayerAction::execute() {
 		}
 	}
 	else if(distance == 1 && owner->combat) { return ActionResult(std::make_shared<AttackAction>(owner, engine.player)); }
+	else return ActionResult(); // This shouldn't happen but is included just in case
 }

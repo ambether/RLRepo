@@ -68,7 +68,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int dx, int dy) {
 	if(engine.dungeon->isWall(owner->x + dx, owner->y + dy)) { return false; }
 	spendEnergy();
-	engine.actionQueue.addAction(std::make_shared<MoveAction>(owner, dx, dy));
+	engine.addAction(std::make_shared<MoveAction>(owner, dx, dy));
 	return true;
 }
 
@@ -121,10 +121,10 @@ void mobAi::update(std::shared_ptr<Entity> owner) {
 
 void mobAi::moveOrAttack(std::shared_ptr<Entity> owner) {
 	spendEnergy();
-	engine.actionQueue.addAction(std::make_shared<MoveAtPlayerAction>(owner));
+	engine.addAction(std::make_shared<MoveAtPlayerAction>(owner));
 }
 
 void mobAi::idle(std::shared_ptr<Entity> owner) {
 	spendEnergy();
-	engine.actionQueue.addAction(std::make_shared<IdleAction>(owner));
+	engine.addAction(std::make_shared<IdleAction>(owner));
 }
