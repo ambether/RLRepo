@@ -39,10 +39,12 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 			for(auto & ent : engine.inactiveEntities) {
 				if(ent->loot && ent->x == owner->x && ent->y == owner->y) {
 					auto lootName = ent->name;
-					if(ent->loot->collect(ent, owner)) {
+					//if(ent->loot->collect(ent, owner)) {
+					if(ent->loot->canCollect(ent, owner)) {
 						found = true;
-						engine.gui->message(TCODColor::lightGrey, "You collect the %s.", lootName);
+						//engine.gui->message(TCODColor::lightGrey, "You collect the %s.", lootName);
 						spendEnergy();
+						engine.addAction(std::make_shared<CollectAction>(ent, owner));
 						break;
 					}
 					else if(!found) {

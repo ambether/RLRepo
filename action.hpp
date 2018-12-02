@@ -12,17 +12,15 @@ public:
 };
 
 
-
 class MoveAction : public Action {
 public:
-//	MoveAction(std::shared_ptr<Entity> owner, int tx, int ty);
 	MoveAction(std::shared_ptr<Entity> owner, int dx, int dy);
 	ActionResult execute();
 private:
 	std::shared_ptr<Entity> owner;
-//	int tx, ty;
 	int dx, dy;
 };
+
 
 class MoveAtPlayerAction : public Action {
 public:
@@ -48,4 +46,13 @@ public:
 	ActionResult execute();
 private:
 	std::shared_ptr<Entity> owner;
+};
+
+
+class CollectAction : public Action {
+public:
+	CollectAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
+	ActionResult execute();
+private:
+	std::shared_ptr<Entity> owner, bearer;
 };
