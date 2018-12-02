@@ -104,9 +104,9 @@ void Engine::render() {
 	gui->render();
 }
 
-void Engine::notifyDeath(std::shared_ptr<Entity> entity) {
-	deaths.emplace_back(entity);
-}
+void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
+
+void Engine::addAction(std::shared_ptr<Action> action) { actionQueue.addAction(action); }
 
 float Engine::getDistance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
