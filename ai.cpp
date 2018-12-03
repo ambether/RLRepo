@@ -15,10 +15,15 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 			int dx = 0, dy = 0;
 			switch(engine.lastKey.vk) {
 			case TCODK_UP:		dy = -1; break;
+			case TCODK_KP8:		dy = -1; break;
 			case TCODK_DOWN:	dy =  1; break;
+			case TCODK_KP2:		dy =  1; break;
 			case TCODK_LEFT:	dx = -1; break;
+			case TCODK_KP4:		dx = -1; break;
 			case TCODK_RIGHT:	dx =  1; break;
-			case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
+			case TCODK_KP6:		dx =  1; break;
+			case TCODK_KP5:		handleActionKey(owner, '.'); break;
+			case TCODK_CHAR:	handleActionKey(owner, engine.lastKey.c); break;
 			default: break;
 			}
 			if(dx != 0 || dy != 0) {
@@ -29,7 +34,7 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 	}
 }
 
-void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TODO: make the use of/interaction with items part of the Action system.
+void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 	switch(ascii) {
 	case 'c': // Collect item
 		{
@@ -61,6 +66,12 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 					engine.addAction(std::make_shared<UseAction>(item, owner));
 				}
 			}
+		}
+		break;
+	case '.': // Idle
+		{
+			spendEnergy();
+			engine.addAction(std::make_shared<IdleAction>(owner));
 		}
 		break;
 	}
