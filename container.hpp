@@ -8,6 +8,7 @@ public:
 	Container(int size);
 	~Container();
 
+	bool canAdd(std::shared_ptr<Entity> entity);
 	bool add(std::shared_ptr<Entity> entity);
 	
 	void del(std::shared_ptr<Entity> entity);

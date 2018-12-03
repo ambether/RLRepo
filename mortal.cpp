@@ -19,11 +19,20 @@ void Mortal::die(std::shared_ptr<Entity> owner) {
 	owner->blocks = false;	
 }
 
+// See how much a heal would affect the Mortal without actually applying the healing.
+float Mortal::predictHeal(float amount) {
+	int _hp = hp;
+	_hp += amount;
+	if(_hp > maxHp) { amount -= _hp - maxHp; }
+	return amount;
+}
+
 float Mortal::heal(float amount) {
 	hp += amount;
 	if(hp > maxHp) { amount -= hp - maxHp; hp = maxHp; }
 	return amount;
 }
+
 
 pcMortal::pcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
@@ -32,6 +41,7 @@ void pcMortal::die(std::shared_ptr<Entity> owner) {
 	Mortal::die(owner);
 	engine.gameState = engine.LOSE;
 }
+
 
 npcMortal::npcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
