@@ -14,6 +14,8 @@ public:
 
 	virtual void die(std::shared_ptr<Entity> owner);
 
+	float predictHeal(float amount);
+
 	float heal(float amount);
 };
 

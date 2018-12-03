@@ -2,9 +2,7 @@
 
 Ai::Ai(int speed) : speed(speed), energy(0) {}
 
-void Ai::gainEnergy() { 
-	energy += speed; 
-}
+void Ai::gainEnergy() { energy += speed; }
 
 void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
 
@@ -39,10 +37,8 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 			for(auto & ent : engine.inactiveEntities) {
 				if(ent->loot && ent->x == owner->x && ent->y == owner->y) {
 					auto lootName = ent->name;
-					//if(ent->loot->collect(ent, owner)) {
 					if(ent->loot->canCollect(ent, owner)) {
 						found = true;
-						//engine.gui->message(TCODColor::lightGrey, "You collect the %s.", lootName);
 						spendEnergy();
 						engine.addAction(std::make_shared<CollectAction>(ent, owner));
 						break;
@@ -60,7 +56,10 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) { // TO
 		{
 			std::shared_ptr<Entity> item = chooseFromInv(owner);
 			if(item) {
-				if(item->loot->use(item, owner)) { spendEnergy(); }
+				if(item->loot->canUse(item, owner)) { 
+					spendEnergy();
+					engine.addAction(std::make_shared<UseAction>(item, owner));
+				}
 			}
 		}
 		break;

@@ -56,3 +56,12 @@ public:
 private:
 	std::shared_ptr<Entity> owner, bearer;
 };
+
+
+class UseAction : public Action {
+public:
+	UseAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
+	ActionResult execute();
+private:
+	std::shared_ptr<Entity> owner, bearer;
+};

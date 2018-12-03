@@ -66,3 +66,12 @@ Action::ActionResult CollectAction::execute() {
 	if(owner->loot->collect(owner, bearer)) { engine.gui->message(TCODColor::lightGrey, "%s collects the %s.", bearer->name, owner->name); }
 	return ActionResult();
 }
+
+
+UseAction::UseAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
+
+Action::ActionResult UseAction::execute() {
+	owner->loot->use(owner, bearer);
+	engine.gui->message(TCODColor::yellow, "%s uses the %s.", bearer->name, owner->name);
+	return ActionResult();
+}
