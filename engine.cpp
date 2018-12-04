@@ -9,9 +9,11 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	player->container = std::make_shared<Container>(10);
 	entityList.push_back(player); activeEntities.push_back(player);
 
-	dungeon = std::make_unique<Map>(80, 43);
-	gui = new Gui();
+	//dungeon = std::make_unique<Map>(80, 43);
+	dungeon = std::make_unique<Map>(130, 65);
+	gui = std::make_unique<Gui>();
 	gui->message(TCODColor::red, "Whalecum nerd.");
+	viewport = std::make_unique<Viewport>(dungeon->w, dungeon->h, this->screenWidth, this->screenHeight - gui->height);
 }
 
 Engine::~Engine() {
@@ -19,7 +21,7 @@ Engine::~Engine() {
 	activeEntities.clear();
 	inactiveEntities.clear();
 	deadEntities.clear(); 
-	delete gui; 
+	//delete gui; 
 }
 
 std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
@@ -97,11 +99,13 @@ void Engine::update() {
 
 void Engine::render() {
 	TCODConsole::root->clear();
-	dungeon->render();
+	dungeon->render(viewport->mapConsole);
+	/////////
 	for(auto & ent : deadEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(); } }
 	for(auto & ent : inactiveEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(); } }
 	for(auto & ent : activeEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(); } }
 	gui->render();
+	TCODConsole::flush();
 }
 
 void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }

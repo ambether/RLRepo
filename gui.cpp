@@ -1,12 +1,7 @@
 #include "main.hpp"
 
-static const int pHeight = 7,
-	bWidth = 20, 
-	msgX = bWidth + 2, 
-	msgHeight = pHeight - 1;
-
 Gui::Gui() {
-	con = new TCODConsole(engine.screenWidth, pHeight);
+	con = new TCODConsole(engine.screenWidth, height);
 }
 
 Gui::~Gui() {
@@ -39,8 +34,8 @@ void Gui::render() {
 	renderMouseLook();
 
 	// Blit the console to the root console
-	TCODConsole::blit(con, 0, 0, engine.screenWidth, pHeight, 
-		TCODConsole::root, 0, engine.screenHeight - pHeight);
+	TCODConsole::blit(con, 0, 0, engine.screenWidth, height, 
+		TCODConsole::root, 0, engine.screenHeight - height);
 }
 
 void Gui::message(const TCODColor & col, const char * text, ...) {

@@ -20,6 +20,7 @@ class Entity;
 #include "entity.hpp"
 #include "map.hpp"
 #include "gui.hpp"
+#include "viewport.hpp"
 #include "action.hpp"
 #include "actionQueue.hpp"
 #include "engine.hpp"
