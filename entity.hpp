@@ -17,7 +17,7 @@ public:
 
 	Entity(int x, int y, const char * name, int ch, const TCODColor & col);
 
-	void render() const;
+	void render(TCODConsole * renderConsole) const;
 	void update(std::shared_ptr<Entity> owner);
 	void gainEnergy();
 

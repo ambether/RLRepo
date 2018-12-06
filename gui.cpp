@@ -1,13 +1,6 @@
 #include "main.hpp"
 
-static const int pHeight = 7,
-	bWidth = 20, 
-	msgX = bWidth + 2, 
-	msgHeight = pHeight - 1;
-
-Gui::Gui() {
-	con = new TCODConsole(engine.screenWidth, pHeight);
-}
+Gui::Gui() { con = new TCODConsole(engine.screenWidth, height); }
 
 Gui::~Gui() {
 	delete con;
@@ -39,8 +32,8 @@ void Gui::render() {
 	renderMouseLook();
 
 	// Blit the console to the root console
-	TCODConsole::blit(con, 0, 0, engine.screenWidth, pHeight, 
-		TCODConsole::root, 0, engine.screenHeight - pHeight);
+	TCODConsole::blit(con, 0, 0, engine.screenWidth, height, 
+		TCODConsole::root, 0, engine.screenHeight - height);
 }
 
 void Gui::message(const TCODColor & col, const char * text, ...) {
@@ -84,12 +77,15 @@ Gui::Message::Message(const char * text, const TCODColor & col) : text(_strdup(t
 Gui::Message::~Message() { delete text; }
 
 void Gui::renderMouseLook() {
-	if(!engine.dungeon->isInFov(engine.mouse.cx, engine.mouse.cy)) { return; }
+	int trueX = engine.mouse.cx + engine.viewport->getOffsetX();
+	int trueY = engine.mouse.cy + engine.viewport->getOffsetY();
+
+	if(!engine.dungeon->isInFov(trueX, trueY)) { return; }
 	char buf[128] = ""; // A buffer of characters
 	bool first = true;
 
 	for(auto & ent : engine.entityList) {
-		if(ent->x == engine.mouse.cx && ent->y == engine.mouse.cy) {
+		if(ent->x == trueX && ent->y == trueY) {
 			if(!first) { strcat_s(buf, ", "); } // If not the first, add a comma and a space.
 			else { first = false; }
 			strcat_s(buf, ent->name);

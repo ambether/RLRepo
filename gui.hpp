@@ -8,6 +8,8 @@ public:
 	void render();
 	void message(const TCODColor & col, const char * text, ...);
 
+	static const int height = 7;
+
 protected:
 	TCODConsole * con;
 
@@ -27,4 +29,8 @@ protected:
 		const TCODColor & barColor, const TCODColor & backColor);
 
 	void renderMouseLook();
+private:
+	static const int bWidth = 20,
+		msgX = bWidth + 2,
+		msgHeight = height - 1;
 };

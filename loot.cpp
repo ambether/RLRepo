@@ -18,10 +18,6 @@ bool Loot::collect(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer
 	return false;
 }
 
-bool Loot::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
-	return false;
-}
-
 void Loot::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	if(bearer->container) { bearer->container->del(owner); }
 }

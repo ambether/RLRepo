@@ -20,7 +20,7 @@ public:
 	bool isInFov(int x, int y) const;
 
 	void computeFov();
-	void render() const;
+	void render(TCODConsole * renderConsole) const;
 	void addMonster(int x, int y);
 
 protected:

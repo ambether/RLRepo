@@ -59,23 +59,18 @@ bool Map::isInFov(int x, int y) const {
 	return false;
 }
 
-void Map::computeFov() {
-	map->computeFov(engine.player->x, engine.player->y, engine.fovRadius);
-}
+void Map::computeFov() { map->computeFov(engine.player->x, engine.player->y, engine.fovRadius); }
 
-void Map::render() const {
+void Map::render(TCODConsole * renderConsole) const {
 	static const TCODColor darkWall(0, 0, 30),
 		darkFloor(50, 50, 80),
 		lightWall(80, 80, 110),
 		lightFloor(100, 100, 100);
 	
-
 	for(int x = 0; x < w; ++x) {
 		for(int y = 0; y < h; ++y) {
-			if(isInFov(x, y))
-				TCODConsole::root->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor);
-			else if(isExplored(x, y))
-				TCODConsole::root->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor);
+			if(isInFov(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor); }
+			else if(isExplored(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor); }
 		}
 	}
 }
