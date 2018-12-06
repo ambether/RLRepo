@@ -20,13 +20,12 @@ public:
 	bool isInFov(int x, int y) const;
 
 	void computeFov();
-	void render(TCODConsole * mapConsole) const;
+	void render(TCODConsole * renderConsole) const;
 	void addMonster(int x, int y);
 
 protected:
 	Tile * tiles;
 	std::shared_ptr<TCODMap> map;
-	//std::unique_ptr<TCODConsole> mapConsole;
 
 	friend class bspList;
 	

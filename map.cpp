@@ -35,7 +35,6 @@ public:
 Map::Map(int w, int h) : w(w), h(h) {
 	tiles = new Tile[w*h];
 	map = std::make_shared<TCODMap>(w, h);
-	//mapConsole = std::make_unique<TCODConsole>(w, h);
 	TCODBsp bsp(0, 0, w, h);
 	bsp.splitRecursive(NULL, 8, rsMAX, rsMAX, 1.5f, 1.5f);
 	bspList listener(*this);
@@ -60,44 +59,20 @@ bool Map::isInFov(int x, int y) const {
 	return false;
 }
 
-void Map::computeFov() {
-	map->computeFov(engine.player->x, engine.player->y, engine.fovRadius);
-}
+void Map::computeFov() { map->computeFov(engine.player->x, engine.player->y, engine.fovRadius); }
 
-void Map::render(TCODConsole * mapConsole) const {
+void Map::render(TCODConsole * renderConsole) const {
 	static const TCODColor darkWall(0, 0, 30),
 		darkFloor(50, 50, 80),
 		lightWall(80, 80, 110),
 		lightFloor(100, 100, 100);
 	
-	//mapConsole->setDefaultBackground(TCODColor::black);
-
-	//mapConsole->clear();
-
-	//int tx = engine.player->x,
-	//	ty = engine.player->y;
-	//int vx = 0, vy = 0;
-	
-	//static const int viewWidth =  engine.screenWidth, 
-	//	viewHeight = engine.screenHeight - 7;
-
-	//vx = tx - viewWidth / 2; vy = ty - viewHeight / 2;
-	//vx = MAX(0, vx); vy = MAX(0, vy);
-	//vx = MIN(vx, w - viewWidth); vy = MIN(vy, h - viewHeight);
-
 	for(int x = 0; x < w; ++x) {
 		for(int y = 0; y < h; ++y) {
-			if(isInFov(x, y)) {
-				mapConsole->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor);
-				//TCODConsole::root->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor); 
-			}
-			else if(isExplored(x, y)) {
-				//TCODConsole::root->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor);
-				mapConsole->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor);
-			}
+			if(isInFov(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor); }
+			else if(isExplored(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor); }
 		}
 	}
-	//TCODConsole::blit(mapConsole.get(), vx, vy, viewWidth, viewHeight, TCODConsole::root, 0, 0);
 }
 
 void Map::addMonster(int x, int y) {

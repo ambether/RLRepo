@@ -9,7 +9,7 @@ int main() {
 	while(!TCODConsole::isWindowClosed()) {
 		engine.update();
 		engine.render();
-		//TCODConsole::flush();
+		TCODConsole::flush();
 	}
     return 0;
 }

@@ -1,8 +1,6 @@
 #include "main.hpp"
 
-Gui::Gui() {
-	con = new TCODConsole(engine.screenWidth, height);
-}
+Gui::Gui() { con = new TCODConsole(engine.screenWidth, height); }
 
 Gui::~Gui() {
 	delete con;
@@ -79,12 +77,15 @@ Gui::Message::Message(const char * text, const TCODColor & col) : text(_strdup(t
 Gui::Message::~Message() { delete text; }
 
 void Gui::renderMouseLook() {
-	if(!engine.dungeon->isInFov(engine.mouse.cx, engine.mouse.cy)) { return; }
+	int trueX = engine.mouse.cx + engine.viewport->getOffsetX();
+	int trueY = engine.mouse.cy + engine.viewport->getOffsetY();
+
+	if(!engine.dungeon->isInFov(trueX, trueY)) { return; }
 	char buf[128] = ""; // A buffer of characters
 	bool first = true;
 
 	for(auto & ent : engine.entityList) {
-		if(ent->x == engine.mouse.cx && ent->y == engine.mouse.cy) {
+		if(ent->x == trueX && ent->y == trueY) {
 			if(!first) { strcat_s(buf, ", "); } // If not the first, add a comma and a space.
 			else { first = false; }
 			strcat_s(buf, ent->name);

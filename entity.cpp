@@ -11,9 +11,9 @@ Entity::Entity(int x, int y, const char * name, int ch, const TCODColor & col)
 	loot(nullptr),
 	container(nullptr) {}
 
-void Entity::render() const {
-	TCODConsole::root->setChar(x, y, ch);
-	TCODConsole::root->setCharForeground(x, y, color);
+void Entity::render(TCODConsole * renderConsole) const {
+	renderConsole->setChar(x, y, ch);
+	renderConsole->setCharForeground(x, y, color);
 }
 
 void Entity::update(std::shared_ptr<Entity> owner) { if(ai) ai->update(owner); }
