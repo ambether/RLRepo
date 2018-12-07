@@ -3,6 +3,7 @@
 class Engine {
 public:
 	enum gameState { START, IDLE, TURN, NEW_TURN, WIN, LOSE } gameState;
+
 	TCOD_key_t lastKey;
 	TCOD_mouse_t mouse;
 
@@ -11,9 +12,9 @@ public:
 	std::vector<std::shared_ptr<Entity>> inactiveEntities;	// It is assumed Entities in this list do not have Ai or Mortal.
 	std::vector<std::shared_ptr<Entity>> deadEntities;		// Entities with Ai and Mortal, but are dead.
 
-	ActionQueue actionQueue;
-
 	std::shared_ptr<Entity> player;
+
+	ActionQueue actionQueue;
 	
 	int fovRadius;
 	int screenWidth, screenHeight;
@@ -33,7 +34,6 @@ public:
 	void render();
 	void notifyDeath(std::shared_ptr<Entity> entity);
 	void addAction(std::shared_ptr<Action> action);
-
 private:
 	bool computeFov;
 	std::vector<std::shared_ptr<Entity>> deaths;

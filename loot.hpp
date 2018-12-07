@@ -19,9 +19,10 @@ public:
 };
 
 class DamageSpell : public Loot {
+public:
+	DamageSpell(float range, float dmg);
 protected:
 	float range, dmg;
-	DamageSpell(float range, float dmg);
 };
 
 class LightningBolt : public DamageSpell {
@@ -33,10 +34,10 @@ public:
 
 class Fireball : public DamageSpell {
 public:
-	float radius;
 	Fireball(float range, float dmg, float radius);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 private:
 	int x, y;
+	float radius;
 };

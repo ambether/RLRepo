@@ -4,9 +4,7 @@ class Entity {
 public:
 	int x, y, ch;
 	TCODColor color;
-	
 	const char * name;
-
 	bool blocks;
 
 	std::shared_ptr<Combat> combat;
