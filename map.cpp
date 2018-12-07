@@ -32,16 +32,20 @@ public:
 	}
 };
 
-Map::Map(int w, int h) : w(w), h(h) {
-	tiles = new Tile[w*h];
-	map = std::make_shared<TCODMap>(w, h);
-	TCODBsp bsp(0, 0, w, h);
+Map::Map(int width, int height) : width(width), height(height) {
+	tiles = new Tile[width * height];
+	map = std::make_shared<TCODMap>(width, height);
+	TCODBsp bsp(0, 0, width, height);
 	bsp.splitRecursive(NULL, 8, rsMAX, rsMAX, 1.5f, 1.5f);
 	bspList listener(*this);
 	bsp.traverseInvertedLevelOrder(&listener, NULL);
 }
 
 Map::~Map() { delete [] tiles; }
+
+int Map::getWidth() const { return width; }
+
+int Map::getHeight() const { return height; }
 
 bool Map::canWalk(int x, int y) const {
 	if(isWall(x, y)) return false;
@@ -51,11 +55,11 @@ bool Map::canWalk(int x, int y) const {
 
 bool Map::isWall(int x, int y) const { return !map->isWalkable(x, y); }
 
-bool Map::isExplored(int x, int y) const { return tiles[x + y*w].isExplored; }
+bool Map::isExplored(int x, int y) const { return tiles[x + y*width].isExplored; }
 
 bool Map::isInFov(int x, int y) const {
-	if(x < 0 || x >= w || y < 0 || y >= h) { return false; }
-	if(map->isInFov(x, y)) { tiles[x + y * w].isExplored = true; return true; }
+	if(x < 0 || x >= width || y < 0 || y >= height) { return false; }
+	if(map->isInFov(x, y)) { tiles[x + y * width].isExplored = true; return true; }
 	return false;
 }
 
@@ -67,8 +71,8 @@ void Map::render(TCODConsole * renderConsole) const {
 		lightWall(80, 80, 110),
 		lightFloor(100, 100, 100);
 	
-	for(int x = 0; x < w; ++x) {
-		for(int y = 0; y < h; ++y) {
+	for(int x = 0; x < width; ++x) {
+		for(int y = 0; y < height; ++y) {
 			if(isInFov(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? lightWall : lightFloor); }
 			else if(isExplored(x, y)) { renderConsole->setCharBackground(x, y, isWall(x, y) ? darkWall : darkFloor); }
 		}

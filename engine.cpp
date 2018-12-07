@@ -12,7 +12,7 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	dungeon = std::make_shared<Map>(130, 65);
 	gui = std::make_shared<Gui>();
 	gui->message(TCODColor::red, "Whalecum nerd.");
-	viewport = std::make_shared<Viewport>(dungeon->w, dungeon->h, this->screenWidth, this->screenHeight - gui->height);
+	viewport = std::make_shared<Viewport>(dungeon->getWidth(), dungeon->getHeight(), screenWidth, screenHeight - gui->height);
 }
 
 Engine::~Engine() {

@@ -12,13 +12,6 @@ float Mortal::takeDamage(std::shared_ptr<Entity> owner, float dmg) {
 	return dmg;
 }
 
-void Mortal::die(std::shared_ptr<Entity> owner) {
-	owner->ch = '%';
-	owner->color = TCODColor::darkRed;
-	owner->name = corpseName;
-	owner->blocks = false;	
-}
-
 // See how much a heal would affect the Mortal without actually applying the healing.
 float Mortal::predictHeal(float amount) {
 	int _hp = hp;
@@ -31,6 +24,13 @@ float Mortal::heal(float amount) {
 	hp += amount;
 	if(hp > maxHp) { amount -= hp - maxHp; hp = maxHp; }
 	return amount;
+}
+
+void Mortal::die(std::shared_ptr<Entity> owner) {
+	owner->ch = '%';
+	owner->color = TCODColor::darkRed;
+	owner->name = corpseName;
+	owner->blocks = false;	
 }
 
 

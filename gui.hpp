@@ -2,14 +2,13 @@
 
 class Gui {
 public:
+	static const int height = 7;
+
 	Gui();
 	~Gui();
 
 	void render();
 	void message(const TCODColor & col, const char * text, ...);
-
-	static const int height = 7;
-
 protected:
 	TCODConsole * con;
 

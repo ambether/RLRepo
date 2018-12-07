@@ -9,10 +9,11 @@ struct Tile {
 
 class Map {
 public:
-	int w, h;
-
-	Map(int w, int h);
+	Map(int width, int height);
 	~Map();
+
+	int getWidth() const;
+	int getHeight() const;
 
 	bool canWalk(int x, int y) const;
 	bool isWall(int x, int y) const;
@@ -23,7 +24,8 @@ public:
 	void render(TCODConsole * renderConsole) const;
 	void addMonster(int x, int y);
 
-protected:
+private:
+	int width, height;
 	Tile * tiles;
 	std::shared_ptr<TCODMap> map;
 
