@@ -81,6 +81,7 @@ bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 	return false;
 }
 
+
 void Engine::update() {
 	if(gameState == START) dungeon->computeFov();
 	if(gameState == NEW_TURN) {
@@ -102,6 +103,7 @@ void Engine::update() {
 }
 
 void Engine::render() {
+	if(computeFov) { dungeon->computeFov(); computeFov = false; }
 	TCODConsole::root->clear();
 	viewport->clear();
 	viewport->renderMap(dungeon);
@@ -116,6 +118,8 @@ void Engine::render() {
 void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
 
 void Engine::addAction(std::shared_ptr<Action> action) { actionQueue.addAction(action); }
+
+void Engine::setComputeFov(bool value) { computeFov = value; }
 
 float Engine::getDistance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
@@ -134,3 +138,4 @@ void Engine::handleDeadEntities() {
 	}
 	deaths.clear();
 }
+

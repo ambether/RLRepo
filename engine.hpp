@@ -34,6 +34,7 @@ public:
 	void render();
 	void notifyDeath(std::shared_ptr<Entity> entity);
 	void addAction(std::shared_ptr<Action> action);
+	void setComputeFov(bool value);
 private:
 	bool computeFov;
 	std::vector<std::shared_ptr<Entity>> deaths;
