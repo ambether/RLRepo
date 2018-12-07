@@ -9,7 +9,7 @@ Action::ActionResult MoveAction::execute() {
 	for(auto & ent : engine.entityList) {
 		if(ent->mortal) {
 			if(!ent->mortal->isDead() && ent->x == owner->x+dx && ent->y == owner->y+dy) {
-				if(owner != engine.player && ent != engine.player) return ActionResult();
+				if(owner != engine.player && ent != engine.player) return ActionResult(std::make_shared<IdleAction>(owner));
 				return ActionResult(std::make_shared<AttackAction>(owner, ent));
 			}
 			else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
