@@ -104,12 +104,8 @@ void Engine::update() {
 void Engine::render() {
 	TCODConsole::root->clear();
 	viewport->clear();
-	//dungeon->render(viewport->mapConsole);
 	viewport->renderMap(dungeon);
 	viewport->moveView(player);
-	///for(auto & ent : deadEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(viewport->mapConsole); } }
-	///for(auto & ent : inactiveEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(viewport->mapConsole); } }
-	///for(auto & ent : activeEntities) { if(dungeon->isInFov(ent->x, ent->y)) { ent->render(viewport->mapConsole); } }
 	for(auto & ent : deadEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
 	for(auto & ent : inactiveEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
 	for(auto & ent : activeEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
