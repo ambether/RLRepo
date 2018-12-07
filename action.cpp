@@ -16,6 +16,7 @@ Action::ActionResult MoveAction::execute() {
 		}
 		else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 	}
+	if(owner == engine.player) engine.setComputeFov(true);
 	owner->x += dx; owner->y += dy;
 	return ActionResult();
 }
