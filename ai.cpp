@@ -36,7 +36,7 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 
 void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 	switch(ascii) {
-	case 'c': // Collect item
+	case 'g': // Grab item
 		{
 			bool found = false;
 			for(auto & ent : engine.inactiveEntities) {
@@ -74,6 +74,34 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 			engine.addAction(std::make_shared<IdleAction>(owner));
 		}
 		break;
+	case 'c': // Interact  // TODO: figure out a more logical key
+		{
+			TCOD_key_t key = chooseInteractDirection();
+			int dx = 0, dy = 0;
+			switch(key.vk) {
+				case TCODK_UP:		dy = -1; break;
+				case TCODK_KP8:		dy = -1; break;
+				case TCODK_DOWN:	dy =  1; break;
+				case TCODK_KP2:		dy =  1; break;
+				case TCODK_LEFT:	dx = -1; break;
+				case TCODK_KP4:		dx = -1; break;
+				case TCODK_RIGHT:	dx =  1; break;
+				case TCODK_KP6:		dx =  1; break;
+				case TCODK_ESCAPE:
+				default:			engine.gui->message(TCODColor::grey, "Canceled."); return;
+			}
+			bool found = false;
+			for(auto & ent : engine.entityList) {
+				if(!ent->interaction) continue;
+				else if(ent->x == owner->x + dx && ent->y == owner->y + dy) {
+					found = true;
+					spendEnergy();
+					engine.addAction(std::make_shared<InteractAction>(ent, owner));
+					break;
+				}
+			}
+			if(!found) engine.gui->message(TCODColor::grey, "There is nothing to interact with there.");
+		}
 	}
 }
 
@@ -112,6 +140,15 @@ std::shared_ptr<Entity> playerAi::chooseFromInv(std::shared_ptr<Entity> owner) {
 		}
 	}
 	return NULL;
+}
+
+TCOD_key_t playerAi::chooseInteractDirection() const {
+	engine.gui->message(TCODColor::cyan, "Choose a direction to interact (Esc to cancel).");
+	engine.gui->render();
+	TCODConsole::flush();
+	TCOD_key_t key;
+	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, true);
+	return key;
 }
 
 

@@ -17,6 +17,7 @@ class Entity;
 #include "ai.hpp"
 #include "loot.hpp"
 #include "container.hpp"
+#include "interaction.hpp"
 #include "entity.hpp"
 #include "map.hpp"
 #include "gui.hpp"

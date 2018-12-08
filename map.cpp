@@ -100,6 +100,8 @@ void Map::addMonster(int x, int y) {
 	}
 }
 
+void Map::setTransparent(int x, int y, bool transparent) { map->setProperties(x, y, transparent, map->isWalkable(x, y)); }
+
 void Map::dig(int x1, int y1, int x2, int y2) {
 	if(x2 < x1) { int tmp = x2; x2 = x1; x1 = tmp; }
 	if(y2 < y1) { int tmp = y2; y2 = y1; y1 = tmp; }

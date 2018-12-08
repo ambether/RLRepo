@@ -65,3 +65,12 @@ public:
 private:
 	std::shared_ptr<Entity> owner, bearer;
 };
+
+
+class InteractAction : public Action {
+public:
+	InteractAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter);
+	ActionResult execute();
+private:
+	std::shared_ptr<Entity> owner, interacter;
+};

@@ -23,6 +23,7 @@ public:
 	void computeFov();
 	void render(TCODConsole * renderConsole) const;
 	void addMonster(int x, int y);
+	void setTransparent(int x, int y, bool transparent);
 
 private:
 	int width, height;

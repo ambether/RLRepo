@@ -12,6 +12,7 @@ public:
 	std::shared_ptr<Ai> ai;
 	std::shared_ptr<Loot> loot;
 	std::shared_ptr<Container> container;
+	std::shared_ptr<Interaction> interaction;
 
 	Entity(int x, int y, const char * name, int ch, const TCODColor & col);
 

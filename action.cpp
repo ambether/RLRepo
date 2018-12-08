@@ -7,14 +7,17 @@ MoveAction::MoveAction(std::shared_ptr<Entity> owner, int dx, int dy) : owner(ow
 
 Action::ActionResult MoveAction::execute() {
 	for(auto & ent : engine.entityList) {
-		if(ent->mortal) {
-			if(!ent->mortal->isDead() && ent->x == owner->x+dx && ent->y == owner->y+dy) {
-				if(owner != engine.player && ent != engine.player) return ActionResult(std::make_shared<IdleAction>(owner));
-				return ActionResult(std::make_shared<AttackAction>(owner, ent));
+		if(ent->x == owner->x + dx && ent->y == owner->y + dy) {
+			if(ent->interaction && ent->blocks) { return ActionResult(std::make_shared<InteractAction>(ent, owner)); }
+			else if(ent->mortal) {
+				if(!ent->mortal->isDead()) {
+					if(owner != engine.player && ent != engine.player) return ActionResult(std::make_shared<IdleAction>(owner));
+					return ActionResult(std::make_shared<AttackAction>(owner, ent));
+				}
+				else { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 			}
-			else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
+			else { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 		}
-		else if(owner == engine.player && ent->x == owner->x+dx && ent->y == owner->y+dy) { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
 	}
 	if(owner == engine.player) engine.setComputeFov(true);
 	owner->x += dx; owner->y += dy;
@@ -74,5 +77,16 @@ UseAction::UseAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bear
 Action::ActionResult UseAction::execute() {
 	owner->loot->use(owner, bearer);
 	engine.gui->message(TCODColor::yellow, "%s uses the %s.", bearer->name, owner->name);
+	return ActionResult();
+}
+
+
+InteractAction::InteractAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter)
+	: owner(owner), 
+	interacter(interacter) {}
+
+Action::ActionResult InteractAction::execute() {
+	engine.gui->message(TCODColor::silver, "%s %s the %s.", interacter->name, owner->interaction->getInteractVerb(), owner->name);
+	owner->interaction->interact(owner, interacter);
 	return ActionResult();
 }

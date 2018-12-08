@@ -18,6 +18,7 @@ protected:
 	void handleActionKey(std::shared_ptr<Entity> owner, int ascii);
 	bool moveOrAttack(std::shared_ptr<Entity> owner, int tX, int tY);
 	std::shared_ptr<Entity> chooseFromInv(std::shared_ptr<Entity> owner);
+	TCOD_key_t chooseInteractDirection() const;
 };
 
 class mobAi : public Ai {
