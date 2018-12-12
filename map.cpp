@@ -21,8 +21,9 @@ public:
 			y = rng->getInt(node->y + 1, node->y + node->h - h - 1);
 			dungeon.createRoom(rNum == 0, x, y, x + w - 1, y + h - 1);
 			if(rNum != 0) {
-				dungeon.dig(lastX, lastY, x + w / 2, lastY);
-				dungeon.dig(x + w / 2, lastY, x + w / 2, y + h / 2);
+				dungeon.dig(lastX, lastY, x + w / 2, lastY); // Horizontal tunnel
+				dungeon.dig(x + w / 2, lastY, x + w / 2, y + h / 2); // Vertical tunnel
+
 			}
 			lastX = x + w / 2;
 			lastY = y + h / 2;
@@ -39,6 +40,7 @@ Map::Map(int width, int height) : width(width), height(height) {
 	bsp.splitRecursive(NULL, 8, rsMAX, rsMAX, 1.5f, 1.5f);
 	bspList listener(*this);
 	bsp.traverseInvertedLevelOrder(&listener, NULL);
+	placeDoors();
 }
 
 Map::~Map() { delete [] tiles; }
@@ -100,6 +102,61 @@ void Map::addMonster(int x, int y) {
 	}
 }
 
+void Map::addDoor(int x, int y) {
+	std::shared_ptr<Entity> door = std::make_shared<Entity>(x, y, "door", '+', TCODColor::darkAmber);
+	door->interaction = std::make_shared<DoorInteraction>();
+	setTransparent(x, y, false);
+	engine.entityList.push_back(door); engine.inactiveEntities.push_back(door);
+}
+
+// Checks the edges of the rooms for gaps and only places a
+// door in a non-wall on the edge if it has a wall on either side of it.
+void Map::placeDoors() {
+	for(int i = 0; i < rooms.size(); ++i) {
+		RoomData rd = rooms[i];
+
+		bool wallLastTop = true, wallLastBottom = true;
+		bool wallCurrentTop = false, wallCurrentBottom = false;
+		for(int x = rd.x; x < rd.x + rd.w; ++x) { // Iterate over the horizontal edges
+			// Check the top edge
+			wallCurrentTop = isWall(x, rd.y - 1);
+			if(wallCurrentTop == false && wallLastTop == true) {
+				// Only add a door if the next space on the edge is a wall
+				if(isWall(x + 1, rd.y - 1)) { addDoor(x, rd.y - 1); }
+			}
+
+			// Check the bottom edge
+			wallCurrentBottom = isWall(x, rd.y +rd.h + 1);
+			if(wallCurrentBottom == false && wallLastBottom == true) {
+				// Only add a door if the next space on the edge is a wall
+				if(isWall(x + 1, rd.y + rd.h + 1)) { addDoor(x, rd.y + rd.h + 1); }
+			}
+			wallLastTop = wallCurrentTop;
+			wallLastBottom = wallCurrentBottom;
+		}
+		
+		bool wallLastLeft = true, wallLastRight = true;
+		bool wallCurrentLeft = false, wallCurrentRight = false;
+		for(int y = rd.y; y < rd.y + rd.h; ++y) { // Iterate over the vertical edges
+			// Check the left edge
+			wallCurrentLeft = isWall(rd.x - 1, y);
+			if(wallCurrentLeft == false && wallLastLeft == true) {
+				// Only add a door if the next space on the edge is a wall
+				if(isWall(rd.x - 1, y + 1)) { addDoor(rd.x - 1, y); } 
+			}
+
+			// Check the right edge
+			wallCurrentRight = isWall(rd.x + rd.w + 1, y);
+			if(wallCurrentRight == false && wallLastRight == true) {
+				// Only add a door if the next space on the edge is a wall
+				if(isWall(rd.x + rd.w + 1, y + 1)) { addDoor(rd.x + rd.w + 1, y); } 
+			}
+			wallLastLeft = wallCurrentLeft;
+			wallLastRight = wallCurrentRight;
+		}
+	}
+}
+
 void Map::setTransparent(int x, int y, bool transparent) { map->setProperties(x, y, transparent, map->isWalkable(x, y)); }
 
 void Map::dig(int x1, int y1, int x2, int y2) {
@@ -113,6 +170,7 @@ void Map::dig(int x1, int y1, int x2, int y2) {
 }
 
 void Map::createRoom(bool first, int x1, int y1, int x2, int y2) {
+	rooms.push_back(RoomData(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
 	dig(x1, y1, x2, y2);
 	int cx = (x1 + x2) / 2;
 	int cy = (y1 + y2) / 2;

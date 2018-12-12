@@ -7,6 +7,7 @@ struct Tile {
 	Tile() : canWalk(false), isExplored(false) {}
 };
 
+
 class Map {
 public:
 	Map(int width, int height);
@@ -23,12 +24,21 @@ public:
 	void computeFov();
 	void render(TCODConsole * renderConsole) const;
 	void addMonster(int x, int y);
+	void addDoor(int x, int y);
+	void placeDoors();
 	void setTransparent(int x, int y, bool transparent);
 
 private:
+	struct RoomData {
+		int x, y, w, h;
+		RoomData(int x, int y, int w, int h) : x(x), y(y), w(w), h(h) {}
+	};
+
 	int width, height;
 	Tile * tiles;
 	std::shared_ptr<TCODMap> map;
+
+	std::vector<RoomData> rooms;
 
 	friend class bspList;
 	
