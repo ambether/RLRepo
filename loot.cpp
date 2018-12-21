@@ -62,12 +62,12 @@ void Healer::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) 
 
 // DAMAGE SPELL
 
-DamageSpell::DamageSpell(float range, float dmg) : range(range), dmg(dmg) {}
+DamageSpellItem::DamageSpellItem(float range, float dmg) : range(range), dmg(dmg) {}
 
 
 // LIGHTNING BOLT
 
-LightningBolt::LightningBolt(float range, float dmg) : DamageSpell(range, dmg) {}
+LightningBolt::LightningBolt(float range, float dmg) : DamageSpellItem(range, dmg) {}
 
 bool LightningBolt::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	std::shared_ptr<Entity> closestMonster = engine.getClosestMonster(bearer->x, bearer->y, range);
@@ -87,7 +87,7 @@ void LightningBolt::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> b
 
 // FIREBALL
 
-Fireball::Fireball(float range, float dmg, float radius) : DamageSpell(range, dmg), radius(radius) {}
+Fireball::Fireball(float range, float dmg, float radius) : DamageSpellItem(range, dmg), radius(radius) {}
 
 bool Fireball::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	engine.gui->message(TCODColor::cyan, "Left-click to cast fireball,\nor right-click to cancel.");

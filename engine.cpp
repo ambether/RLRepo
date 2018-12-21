@@ -7,6 +7,9 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	player->combat = std::make_shared<Combat>(5);
 	player->ai = std::make_shared<playerAi>();
 	player->container = std::make_shared<Container>(10);
+	player->spellCaster = std::make_shared<SpellCaster>();
+	player->spellCaster->spellList.push_back(std::make_shared<DamageSpell>("Magic Missle", 1, 10.0f, 5.0f, TCODColor::lighterPurple));
+	player->spellCaster->spellList.push_back(std::make_shared<DamageSpell>("Fireball", 2, 5.0f, 2.0f, 8.0f, TCODColor::flame));
 	entityList.push_back(player); activeEntities.push_back(player);
 
 	dungeon = std::make_shared<Map>(130, 65);
@@ -20,6 +23,7 @@ Engine::~Engine() {
 	activeEntities.clear();
 	inactiveEntities.clear();
 	deadEntities.clear(); 
+	deaths.clear();
 }
 
 std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
@@ -41,7 +45,7 @@ std::shared_ptr<Entity> Engine::getMonster(int x, int y) const {
 	for(auto & ent : activeEntities) {
 		if(ent->x == x && ent->y == y) { return ent; }
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
@@ -53,7 +57,7 @@ bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 				trueX = viewport->getOffsetX() + cx;
 				trueY = viewport->getOffsetY() + cy;
 				if(dungeon->isInFov(trueX, trueY) && (maxRange == 0 || player->getDistance(trueX, trueY) <= maxRange)) {
-					if(getDistance(cx, cy, mouse.cx, mouse.cy) <= radius) {
+					if(radius > 0 && getDistance(cx, cy, mouse.cx, mouse.cy) <= radius) {
 						TCODColor col = viewport->getCharBackground(trueX, trueY);
 						col = col * 0.8f;
 						col.r += 80;

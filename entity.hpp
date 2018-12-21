@@ -13,6 +13,7 @@ public:
 	std::shared_ptr<Loot> loot;
 	std::shared_ptr<Container> container;
 	std::shared_ptr<Interaction> interaction;
+	std::shared_ptr<SpellCaster> spellCaster;
 
 	Entity(int x, int y, const char * name, int ch, const TCODColor & col);
 

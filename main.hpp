@@ -12,6 +12,8 @@
 
 class Entity;
 
+#include "spell.hpp"
+#include "spellCaster.hpp"
 #include "mortal.hpp"
 #include "combat.hpp"
 #include "ai.hpp"

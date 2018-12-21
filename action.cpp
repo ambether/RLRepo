@@ -90,3 +90,12 @@ Action::ActionResult InteractAction::execute() {
 	owner->interaction->interact(owner, interacter);
 	return ActionResult();
 }
+
+
+CastAction::CastAction(std::shared_ptr<Spell> spell, std::shared_ptr<Entity> caster) : spell(spell), caster(caster) {}
+
+Action::ActionResult CastAction::execute() {
+	engine.gui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->getName().c_str());
+	spell->use(caster);
+	return ActionResult();
+}

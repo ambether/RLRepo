@@ -60,11 +60,9 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 	case 'i': // Access inventory
 		{
 			std::shared_ptr<Entity> item = chooseFromInv(owner);
-			if(item) {
-				if(item->loot->canUse(item, owner)) { 
-					spendEnergy();
-					engine.addAction(std::make_shared<UseAction>(item, owner));
-				}
+			if(item != nullptr && item->loot->canUse(item, owner)) { 
+				spendEnergy();
+				engine.addAction(std::make_shared<UseAction>(item, owner));
 			}
 		}
 		break;
@@ -101,7 +99,17 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 				}
 			}
 			if(!found) engine.gui->message(TCODColor::grey, "There is nothing to interact with there.");
+		} 
+		break;
+	case 'f': // Fire spell
+		{
+			std::shared_ptr<Spell> spell = chooseFromSpells(owner);
+			if(spell != nullptr && spell->canUse(owner)) {
+				spendEnergy();
+				engine.addAction(std::make_shared<CastAction>(spell, owner));
+			}
 		}
+		break;
 	}
 }
 
@@ -132,14 +140,45 @@ std::shared_ptr<Entity> playerAi::chooseFromInv(std::shared_ptr<Entity> owner) {
 	TCODConsole::flush();
 
 	TCOD_key_t key;
-	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, true);
+	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, nullptr, true);
 	if(key.vk == TCODK_CHAR) {
 		int itemIndex = key.c - 'a';
 		if(itemIndex >= 0 && itemIndex < owner->container->inventory.size()) {
 			return owner->container->inventory.at(itemIndex);
 		}
 	}
-	return NULL;
+	return nullptr;
+}
+
+std::shared_ptr<Spell> playerAi::chooseFromSpells(std::shared_ptr<Entity> owner) {
+	static const int frameW = 50, frameH = 28;
+	static TCODConsole con(frameW, frameH);
+
+	con.setDefaultForeground(TCODColor(200, 180, 50));
+	con.printFrame(0, 0, frameW, frameH, true, TCOD_BKGND_DEFAULT, "Spell List");
+
+	int is = 'a';
+	int i = 1;
+
+	for(auto & spell : owner->spellCaster->spellList) {
+		if(owner->spellCaster->getCharges(spell->getLevel()) == 0) con.setDefaultForeground(TCODColor::darkGrey);
+		else con.setDefaultForeground(TCODColor::white);
+		con.print(2, i, "(%c) %s (level %d)", is, spell->getName().c_str(), spell->getLevel());
+		++i; ++is;
+	}
+
+	TCODConsole::blit(&con, 0, 0, frameW, frameH, TCODConsole::root, engine.screenWidth / 2 - frameW / 2, engine.screenHeight / 2 - frameH / 2);
+	TCODConsole::flush();
+
+	TCOD_key_t key;
+	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, nullptr, true);
+	if(key.vk == TCODK_CHAR) {
+		int spellIndex = key.c - 'a';
+		if(spellIndex >= 0 && spellIndex < owner->spellCaster->spellList.size()) {
+			return owner->spellCaster->spellList.at(spellIndex);
+		}
+	}
+	return nullptr;
 }
 
 TCOD_key_t playerAi::chooseInteractDirection() const {

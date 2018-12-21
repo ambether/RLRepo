@@ -74,3 +74,13 @@ public:
 private:
 	std::shared_ptr<Entity> owner, interacter;
 };
+
+
+class CastAction : public Action {
+public:
+	CastAction(std::shared_ptr<Spell> spell, std::shared_ptr<Entity> caster);
+	ActionResult execute();
+private:
+	std::shared_ptr<Spell> spell;
+	std::shared_ptr<Entity> caster;
+};

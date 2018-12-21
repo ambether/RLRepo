@@ -18,21 +18,21 @@ public:
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };
 
-class DamageSpell : public Loot {
+class DamageSpellItem : public Loot {
 public:
-	DamageSpell(float range, float dmg);
+	DamageSpellItem(float range, float dmg);
 protected:
 	float range, dmg;
 };
 
-class LightningBolt : public DamageSpell {
+class LightningBolt : public DamageSpellItem {
 public:
 	LightningBolt(float range, float dmg);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };
 
-class Fireball : public DamageSpell {
+class Fireball : public DamageSpellItem {
 public:
 	Fireball(float range, float dmg, float radius);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);

@@ -10,7 +10,8 @@ Entity::Entity(int x, int y, const char * name, int ch, const TCODColor & col)
 	ai(nullptr),
 	loot(nullptr),
 	container(nullptr),
-	interaction(nullptr) {}
+	interaction(nullptr),
+	spellCaster(nullptr) {}
 
 void Entity::render(TCODConsole * renderConsole) const {
 	renderConsole->setChar(x, y, ch);
