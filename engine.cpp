@@ -12,12 +12,9 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	player->spellCaster->spellList.push_back(std::make_shared<DamageSpell>("Fireball", 2, 5.0f, 2.0f, 8.0f, TCODColor::flame));
 	entityList.push_back(player); activeEntities.push_back(player);
 
-	dungeon = std::make_shared<Map>(130, 65);
+	dungeon = std::make_shared<Map>(130, 80);
 	ui = std::make_shared<Ui>();
 	ui->message(TCODColor::red, "Whalecum nerd.");
-	gui = std::make_shared<Gui>();
-	gui->message(TCODColor::red, "Whalecum nerd.");
-	viewport = std::make_shared<Viewport>(dungeon->getWidth(), dungeon->getHeight(), screenWidth, screenHeight - gui->height);
 }
 
 Engine::~Engine() {
@@ -54,34 +51,34 @@ bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 	while(!TCODConsole::isWindowClosed()) {
 		render();
 		int trueX, trueY;
-		for(int cx = 0; cx < viewport->getViewWidth(); ++cx) {
-			for(int cy = 0; cy < viewport->getViewHeight(); ++cy) {
-				trueX = viewport->getOffsetX() + cx;
-				trueY = viewport->getOffsetY() + cy;
+		for(int cx = 0; cx < ui->viewport->getWidth(); ++cx) {
+			for(int cy = 0; cy < ui->viewport->getHeight(); ++cy) {
+				trueX = ui->viewport->getOffsetX() + cx;
+				trueY = ui->viewport->getOffsetY() + cy;
 				if(dungeon->isInFov(trueX, trueY) && (maxRange == 0 || player->getDistance(trueX, trueY) <= maxRange)) {
 					if(radius > 0 && getDistance(cx, cy, mouse.cx, mouse.cy) <= radius) {
-						TCODColor col = viewport->getCharBackground(trueX, trueY);
+						TCODColor col = ui->viewport->getCharBackground(trueX, trueY);
 						col = col * 0.8f;
 						col.r += 80;
-						viewport->setCharBackground(trueX, trueY, col);
+						ui->viewport->setCharBackground(trueX, trueY, col);
 					}
 					else {
-						TCODColor col = viewport->getCharBackground(trueX, trueY);
+						TCODColor col = ui->viewport->getCharBackground(trueX, trueY);
 						col = col*1.2f;
-						viewport->setCharBackground(trueX, trueY, col);
+						ui->viewport->setCharBackground(trueX, trueY, col);
 					}
 				}
 			}
 		}
 		TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
-		int trueMouseX = mouse.cx + viewport->getOffsetX();
-		int trueMouseY = mouse.cy + viewport->getOffsetY();
+		int trueMouseX = mouse.cx + ui->viewport->getOffsetX();
+		int trueMouseY = mouse.cy + ui->viewport->getOffsetY();
 		if(dungeon->isInFov(trueMouseX, trueMouseY) && (maxRange == 0 || player->getDistance(trueMouseX, trueMouseY) <= maxRange)) {
-			viewport->setCharBackground(trueMouseX, trueMouseY, TCODColor::black);
+			ui->viewport->setCharBackground(trueMouseX, trueMouseY, TCODColor::black);
 			if(mouse.lbutton_pressed) { *x = trueMouseX; *y = trueMouseY; return true; }
 		}
 		if(mouse.rbutton_pressed) { return false; }
-		viewport->render();
+		ui->viewport->render();
 		TCODConsole::flush();
 	}
 	return false;
@@ -110,14 +107,12 @@ void Engine::update() {
 void Engine::render() {
 	if(computeFov) { dungeon->computeFov(); computeFov = false; }
 	TCODConsole::root->clear();
-	viewport->clear();
-	viewport->renderMap(dungeon);
-	viewport->moveView(player);
-	for(auto & ent : deadEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
-	for(auto & ent : inactiveEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
-	for(auto & ent : activeEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
-	viewport->render();
-	//gui->render();//
+	ui->viewport->clear();
+	ui->viewport->renderMap(dungeon);
+	ui->viewport->moveView(player);
+	for(auto & ent : deadEntities)		{ if(dungeon->isInFov(ent->x, ent->y)) { ui->viewport->renderEntity(ent); } }
+	for(auto & ent : inactiveEntities)	{ if(dungeon->isInFov(ent->x, ent->y)) { ui->viewport->renderEntity(ent); } }
+	for(auto & ent : activeEntities)	{ if(dungeon->isInFov(ent->x, ent->y)) { ui->viewport->renderEntity(ent); } }
 	ui->render();
 }
 

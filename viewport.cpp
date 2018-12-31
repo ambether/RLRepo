@@ -1,21 +1,20 @@
 #include "main.hpp"
 
-Viewport::Viewport(int mapWidth, int mapHeight, int viewWidth, int viewHeight)
-	: viewportX(0), viewportY(0),
-	viewWidth(viewWidth), viewHeight(viewHeight),
+Viewport::Viewport(int width, int height, int mapWidth, int mapHeight)
+	: UiElement(width, height), 
+	viewportX(0), viewportY(0),
+	//viewWidth(viewWidth), viewHeight(viewHeight),
 	mapWidth(mapWidth), mapHeight(mapHeight),
-	halfViewWidth(viewWidth/2), halfviewHeight(viewHeight/2),
-	diffWidth(mapWidth-viewWidth), diffHeight(mapHeight-viewHeight) {
+	halfViewWidth(width/2), halfviewHeight(height/2),
+	diffWidth(mapWidth-width), diffHeight(mapHeight-height) {
 	mapConsole = new TCODConsole(mapWidth, mapHeight);
 }
 
 Viewport::~Viewport() { delete mapConsole; }
 
-void Viewport::render() const { TCODConsole::blit(mapConsole, viewportX, viewportY, viewWidth, viewHeight, TCODConsole::root, 0, 0); }
+void Viewport::render() const { TCODConsole::blit(mapConsole, viewportX, viewportY, width, height, TCODConsole::root, 0, 0); }
 
-void Viewport::renderMap(std::shared_ptr<Map> map) {
-	map->render(mapConsole);
-}
+void Viewport::renderMap(std::shared_ptr<Map> map) { map->render(mapConsole); }
 
 void Viewport::renderEntity(std::shared_ptr<Entity> entity) { entity->render(mapConsole); }
 
@@ -27,9 +26,9 @@ int Viewport::getOffsetX() const { return viewportX; }
 
 int Viewport::getOffsetY() const { return viewportY; }
 
-int Viewport::getViewWidth() const { return viewWidth; }
+int Viewport::getWidth() const { return width; }
 
-int Viewport::getViewHeight() const { return viewHeight; }
+int Viewport::getHeight() const { return height; }
 
 TCODColor Viewport::getCharBackground(int x, int y) const { return mapConsole->getCharBackground(x, y); }
 

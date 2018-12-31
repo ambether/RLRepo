@@ -1,11 +1,11 @@
 #pragma once
 
-class Viewport {
+class Viewport : public UiElement {
 public:
-	Viewport(int mapWidth, int mapHeight, int viewWidth, int viewHeight);
+	Viewport(int width, int height, int mapWidth, int mapHeight);
 	~Viewport();
 	
-	void render() const;
+	void render() const override;
 	void renderMap(std::shared_ptr<Map> map);
 	void renderEntity(std::shared_ptr<Entity> entity);
 	void clear();
@@ -13,8 +13,8 @@ public:
 
 	int getOffsetX() const;
 	int getOffsetY() const;
-	int getViewWidth() const;
-	int getViewHeight() const;
+	int getWidth() const;
+	int getHeight() const;
 
 	TCODColor getCharBackground(int x, int y) const;
 	void setCharBackground(int x, int y, const TCODColor & col);
@@ -22,8 +22,7 @@ private:
 	TCODConsole * mapConsole;
 
 	int viewportX, viewportY,
-		mapWidth, mapHeight,
-		viewWidth, viewHeight;
+		mapWidth, mapHeight;
 
 	int const halfViewWidth, halfviewHeight,
 		diffWidth, diffHeight;

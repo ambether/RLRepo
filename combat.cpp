@@ -6,10 +6,10 @@ void Combat::attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> ta
 	if(target->mortal && !target->mortal->isDead()) {
 		float dmg = atk - target->mortal->def;
 		if(dmg > 0.0) {
-			engine.gui->message(attacker == engine.player ? TCODColor::red : TCODColor::lightGrey, "The %s attacks the %s for %g damage!", attacker->name, target->name, dmg);
+			engine.ui->message(attacker == engine.player ? TCODColor::red : TCODColor::lightGrey, "The %s attacks the %s for %g damage!", attacker->name, target->name, dmg);
 			target->mortal->takeDamage(target, atk);
 		}
-		else { engine.gui->message(TCODColor::lightGrey, "The %s has no effect on the %s !", attacker->name, target->name); }
+		else { engine.ui->message(TCODColor::lightGrey, "The %s has no effect on the %s !", attacker->name, target->name); }
 	}
-	else { engine.gui->message(TCODColor::lightGrey, "The %s is too weak to hurt the %s !", attacker->name, target->name); }
+	else { engine.ui->message(TCODColor::lightGrey, "The %s is too weak to hurt the %s !", attacker->name, target->name); }
 }

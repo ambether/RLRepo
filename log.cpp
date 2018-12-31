@@ -4,7 +4,7 @@ Log::Log(int width, int height) : UiElement(width, height) {}
 
 Log::~Log() { log.clear(); }
 
-void Log::render() {
+void Log::render() const {
 	con->setDefaultBackground(TCODColor::black);
 	con->setDefaultForeground(TCODColor::darkerGrey);
 	con->clear();
@@ -31,7 +31,7 @@ void Log::message(const TCODColor & col, char text[128]) {
 	char * lineBegin = text;
 	char * lineEnd;
 	do {
-		if(size(log) == height - 1) { log.erase(begin(log)); }
+		if(size(log) == height - 2) { log.erase(begin(log)); }
 		lineEnd = strchr(lineBegin, '\n');
 		if(lineEnd) { *lineEnd = '\0'; }
 		std::shared_ptr<Message> msg = std::make_shared<Message>(lineBegin, col);

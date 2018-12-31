@@ -4,7 +4,7 @@ class Log : public UiElement {
 public:
 	Log(int width, int height);
 	~Log();
-	void render() override;
+	void render() const override;
 	void message(const TCODColor & col, char text[128]);
 private:
 	struct Message {

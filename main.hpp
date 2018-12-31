@@ -26,8 +26,8 @@ class Entity;
 
 #include "map.hpp"
 #include "gui.hpp"
-#include "viewport.hpp"
 #include "uiElement.hpp"
+#include "viewport.hpp"
 #include "inspectScreen.hpp"
 #include "log.hpp"
 #include "statScreen.hpp"

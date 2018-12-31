@@ -4,7 +4,7 @@ class UiElement {
 public:
 	UiElement(int width, int height);
 	~UiElement();
-	virtual void render() = 0;
+	virtual void render() const = 0;
 	int getWidth() const;
 	int getHeight() const;
 protected:

@@ -2,7 +2,8 @@
 
 StatScreen::StatScreen(int width, int height) : UiElement(width, height) {}
 
-void StatScreen::render() {
+void StatScreen::render() const {
+	static const int barWidth = width - 4;
 	con->setDefaultBackground(TCODColor::black);
 	con->setDefaultForeground(TCODColor::darkerGrey);
 	con->clear();
@@ -17,7 +18,7 @@ void StatScreen::render() {
 void StatScreen::renderBar(int x, int y, int width,
 	const char * name,
 	float value, float maxValue,
-	const TCODColor & barColor, const TCODColor & backColor) {
+	const TCODColor & barColor, const TCODColor & backColor) const {
 	con->setDefaultBackground(backColor);
 	con->rect(x, y, width, 1, false, TCOD_BKGND_SET);
 
