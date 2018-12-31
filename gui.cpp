@@ -13,7 +13,7 @@ void Gui::render() {
 
 	renderBar(1, 1, bWidth, "HP", engine.player->mortal->hp, engine.player->mortal->maxHp, TCODColor::lightRed, TCODColor::darkerRed);
 
-	// y will be responsible for our message position on the console
+	// y will be responsible for the message position on the console
 	// cCoef is short for "color coefficient" and will make text look darker
 	int y = 1;
 	float cCoef(0.4f);

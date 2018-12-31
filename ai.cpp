@@ -50,11 +50,11 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 					}
 					else if(!found) {
 						found = true;
-						engine.gui->message(TCODColor::red, "Your inventory is full.");
+						engine.ui->message(TCODColor::red, "Your inventory is full.");
 					}
 				}
 			}
-			if(!found) { engine.gui->message(TCODColor::lightGrey, "There's nothing here."); }
+			if(!found) { engine.ui->message(TCODColor::lightGrey, "There's nothing here."); }
 		}
 		break;
 	case 'i': // Access inventory
@@ -86,7 +86,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 				case TCODK_RIGHT:	dx =  1; break;
 				case TCODK_KP6:		dx =  1; break;
 				case TCODK_ESCAPE:
-				default:			engine.gui->message(TCODColor::grey, "Canceled."); return;
+				default:			engine.ui->message(TCODColor::grey, "Canceled."); return;
 			}
 			bool found = false;
 			for(auto & ent : engine.entityList) {
@@ -98,7 +98,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 					break;
 				}
 			}
-			if(!found) engine.gui->message(TCODColor::grey, "There is nothing to interact with there.");
+			if(!found) engine.ui->message(TCODColor::grey, "There is nothing to interact with there.");
 		} 
 		break;
 	case 'f': // Fire spell
@@ -182,8 +182,8 @@ std::shared_ptr<Spell> playerAi::chooseFromSpells(std::shared_ptr<Entity> owner)
 }
 
 TCOD_key_t playerAi::chooseInteractDirection() const {
-	engine.gui->message(TCODColor::cyan, "Choose a direction to interact (Esc to cancel).");
-	engine.gui->render();
+	engine.ui->message(TCODColor::cyan, "Choose a direction to interact (Esc to cancel).");
+	engine.ui->render();
 	TCODConsole::flush();
 	TCOD_key_t key;
 	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, true);

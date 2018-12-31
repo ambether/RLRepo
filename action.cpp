@@ -14,9 +14,9 @@ Action::ActionResult MoveAction::execute() {
 					if(owner != engine.player && ent != engine.player) return ActionResult(std::make_shared<IdleAction>(owner));
 					return ActionResult(std::make_shared<AttackAction>(owner, ent));
 				}
-				else { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
+				else { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
 			}
-			else { engine.gui->message(TCODColor::white, "There is a %s here.", ent->name); }
+			else { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
 		}
 	}
 	if(owner == engine.player) engine.setComputeFov(true);
@@ -67,7 +67,7 @@ Action::ActionResult MoveAtPlayerAction::execute() {
 CollectAction::CollectAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
 
 Action::ActionResult CollectAction::execute() {
-	if(owner->loot->collect(owner, bearer)) { engine.gui->message(TCODColor::lightGrey, "%s collects the %s.", bearer->name, owner->name); }
+	if(owner->loot->collect(owner, bearer)) { engine.ui->message(TCODColor::lightGrey, "%s collects the %s.", bearer->name, owner->name); }
 	return ActionResult();
 }
 
@@ -76,7 +76,7 @@ UseAction::UseAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bear
 
 Action::ActionResult UseAction::execute() {
 	owner->loot->use(owner, bearer);
-	engine.gui->message(TCODColor::yellow, "%s uses the %s.", bearer->name, owner->name);
+	engine.ui->message(TCODColor::yellow, "%s uses the %s.", bearer->name, owner->name);
 	return ActionResult();
 }
 
@@ -86,7 +86,7 @@ InteractAction::InteractAction(std::shared_ptr<Entity> owner, std::shared_ptr<En
 	interacter(interacter) {}
 
 Action::ActionResult InteractAction::execute() {
-	engine.gui->message(TCODColor::silver, "%s %s the %s.", interacter->name, owner->interaction->getInteractVerb(), owner->name);
+	engine.ui->message(TCODColor::silver, "%s %s the %s.", interacter->name, owner->interaction->getInteractVerb(), owner->name);
 	owner->interaction->interact(owner, interacter);
 	return ActionResult();
 }
@@ -95,7 +95,7 @@ Action::ActionResult InteractAction::execute() {
 CastAction::CastAction(std::shared_ptr<Spell> spell, std::shared_ptr<Entity> caster) : spell(spell), caster(caster) {}
 
 Action::ActionResult CastAction::execute() {
-	engine.gui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->getName().c_str());
+	engine.ui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->getName().c_str());
 	spell->use(caster);
 	return ActionResult();
 }

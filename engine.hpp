@@ -19,8 +19,7 @@ public:
 	int fovRadius;
 	int screenWidth, screenHeight;
 	std::shared_ptr<Map> dungeon;
-	std::shared_ptr<Viewport> viewport;
-	std::shared_ptr<Gui> gui;
+	std::shared_ptr<Ui> ui;
 
 	Engine(int sW, int sH);
 	~Engine();

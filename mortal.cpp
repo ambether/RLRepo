@@ -37,7 +37,7 @@ void Mortal::die(std::shared_ptr<Entity> owner) {
 pcMortal::pcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
 void pcMortal::die(std::shared_ptr<Entity> owner) {
-	engine.gui->message(TCODColor::red, "You've been slain nerd.");
+	engine.ui->message(TCODColor::red, "You've been slain nerd.");
 	Mortal::die(owner);
 	engine.gameState = engine.LOSE;
 }
@@ -46,6 +46,6 @@ void pcMortal::die(std::shared_ptr<Entity> owner) {
 npcMortal::npcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
 
 void npcMortal::die(std::shared_ptr<Entity> owner) {
-	engine.gui->message(TCODColor::lightGrey, "The %s has perished like a nerd.", owner->name);
+	engine.ui->message(TCODColor::lightGrey, "The %s has perished like a nerd.", owner->name);
 	Mortal::die(owner);
 }

@@ -37,12 +37,12 @@ DamageSpell::DamageSpell(std::string name, int level, float range, float damage,
 
 bool DamageSpell::canUse(std::shared_ptr<Entity> owner) {
 	if(owner->spellCaster->getCharges(level) > 0) {
-		engine.gui->message(TCODColor::cyan, "Left-click on an enemy to cast %s\nor right-click to cancel.", name.c_str());
+		engine.ui->message(TCODColor::cyan, "Left-click on an enemy to cast %s\nor right-click to cancel.", name.c_str());
 		if(!engine.pickTile(&tx, &ty, range, radius)) return false;
 		if(radius == 0 && engine.getMonster(tx, ty) == nullptr) return false;
 		return true;
 	}
-	engine.gui->message(TCODColor::red, "Insufficient spell points.");
+	engine.ui->message(TCODColor::red, "Insufficient spell points.");
 	return false;
 }
 
@@ -50,7 +50,7 @@ void DamageSpell::use(std::shared_ptr<Entity> owner) {
 	owner->spellCaster->useCharge(level);
 	for(auto & ent : engine.activeEntities) {
 		if(ent->getDistance(tx, ty) <= radius) {
-			engine.gui->message(color, "%s takes %g damage!", ent->name, damage);
+			engine.ui->message(color, "%s takes %g damage!", ent->name, damage);
 			ent->mortal->takeDamage(ent, damage);
 		}
 	}
