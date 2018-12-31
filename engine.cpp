@@ -13,6 +13,8 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	entityList.push_back(player); activeEntities.push_back(player);
 
 	dungeon = std::make_shared<Map>(130, 65);
+	ui = std::make_shared<Ui>();
+	ui->message(TCODColor::red, "Whalecum nerd.");
 	gui = std::make_shared<Gui>();
 	gui->message(TCODColor::red, "Whalecum nerd.");
 	viewport = std::make_shared<Viewport>(dungeon->getWidth(), dungeon->getHeight(), screenWidth, screenHeight - gui->height);
@@ -85,7 +87,6 @@ bool Engine::pickTile(int * x, int * y, float maxRange, float radius) {
 	return false;
 }
 
-
 void Engine::update() {
 	if(gameState == START) dungeon->computeFov();
 	if(gameState == NEW_TURN) {
@@ -116,7 +117,8 @@ void Engine::render() {
 	for(auto & ent : inactiveEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
 	for(auto & ent : activeEntities) { if(dungeon->isInFov(ent->x, ent->y)) { viewport->renderEntity(ent); } }
 	viewport->render();
-	gui->render();
+	//gui->render();//
+	ui->render();
 }
 
 void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
