@@ -9,7 +9,16 @@ void StatScreen::render() const {
 	con->clear();
 	con->printFrame(0, 0, width, height);
 
-	renderBar(2, 1, barWidth, "HP", engine.player->mortal->hp, engine.player->mortal->maxHp, TCODColor::lightRed, TCODColor::darkerRed);
+	renderBar(2, 2, barWidth, "HP", engine.player->mortal->hp, engine.player->mortal->maxHp, TCODColor::lightRed, TCODColor::darkerRed);
+
+	con->setDefaultBackground(TCODColor::black);
+	con->setDefaultForeground(TCODColor::white);
+
+	con->printFrame(1, 4, width - 2, 6, true, TCOD_BKGND_DEFAULT, "Spell Charges");
+
+	con->print(2, 6, "I:   %d", engine.player->spellCaster->getCharges(1));
+	con->print(2, 7, "II:  %d", engine.player->spellCaster->getCharges(2));
+	con->print(2, 8, "III: %d", engine.player->spellCaster->getCharges(3));
 
 	TCODConsole::blit(con, 0, 0, width, height,
 		TCODConsole::root, engine.screenWidth - width, 0);
