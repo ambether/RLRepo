@@ -29,7 +29,7 @@ void InspectScreen::render() const {
 			}
 		}
 		con->setDefaultForeground(TCODColor::lightGrey);
-		con->print(2, 1, buf);
+		con->print(1, 1, buf);
 	}
 
 	TCODConsole::blit(con, 0, 0, width, height,

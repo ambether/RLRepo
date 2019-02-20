@@ -126,10 +126,10 @@ void Map::placeDoors() {
 			}
 
 			// Check the bottom edge
-			wallCurrentBottom = isWall(x, rd.y +rd.h + 1);
+			wallCurrentBottom = isWall(x, rd.y + rd.h);
 			if(wallCurrentBottom == false && wallLastBottom == true) {
 				// Only add a door if the next space on the edge is a wall
-				if(isWall(x + 1, rd.y + rd.h + 1)) { addDoor(x, rd.y + rd.h + 1); }
+				if(isWall(x + 1, rd.y + rd.h)) { addDoor(x, rd.y + rd.h); }
 			}
 			wallLastTop = wallCurrentTop;
 			wallLastBottom = wallCurrentBottom;
@@ -146,10 +146,10 @@ void Map::placeDoors() {
 			}
 
 			// Check the right edge
-			wallCurrentRight = isWall(rd.x + rd.w + 1, y);
+			wallCurrentRight = isWall(rd.x + rd.w, y);
 			if(wallCurrentRight == false && wallLastRight == true) {
 				// Only add a door if the next space on the edge is a wall
-				if(isWall(rd.x + rd.w + 1, y + 1)) { addDoor(rd.x + rd.w + 1, y); } 
+				if(isWall(rd.x + rd.w, y + 1)) { addDoor(rd.x + rd.w, y); } 
 			}
 			wallLastLeft = wallCurrentLeft;
 			wallLastRight = wallCurrentRight;
