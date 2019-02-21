@@ -1,9 +1,8 @@
 #include "main.hpp"
 
-Mortal::Mortal(float maxHp, float def, const char * corpseName) : maxHp(maxHp), hp(maxHp), def(def), corpseName(corpseName) {}
+Mortal::Mortal(int maxHp, const char * corpseName) : maxHp(maxHp), hp(maxHp), corpseName(corpseName) {}
 
-float Mortal::takeDamage(std::shared_ptr<Entity> owner, float dmg) {
-	dmg -= def;
+int Mortal::takeDamage(std::shared_ptr<Entity> owner, int dmg) {
 	if(dmg > 0) {
 		hp -= dmg;
 		if(hp <= 0) { engine.notifyDeath(owner); }
@@ -13,14 +12,14 @@ float Mortal::takeDamage(std::shared_ptr<Entity> owner, float dmg) {
 }
 
 // See how much a heal would affect the Mortal without actually applying the healing.
-float Mortal::predictHeal(float amount) {
+int Mortal::predictHeal(int amount) {
 	int _hp = hp;
 	_hp += amount;
 	if(_hp > maxHp) { amount -= _hp - maxHp; }
 	return amount;
 }
 
-float Mortal::heal(float amount) {
+int Mortal::heal(int amount) {
 	hp += amount;
 	if(hp > maxHp) { amount -= hp - maxHp; hp = maxHp; }
 	return amount;
@@ -34,7 +33,7 @@ void Mortal::die(std::shared_ptr<Entity> owner) {
 }
 
 
-pcMortal::pcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
+pcMortal::pcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
 
 void pcMortal::die(std::shared_ptr<Entity> owner) {
 	engine.ui->message(TCODColor::red, "You've been slain nerd.");
@@ -43,7 +42,7 @@ void pcMortal::die(std::shared_ptr<Entity> owner) {
 }
 
 
-npcMortal::npcMortal(float maxHp, float def, const char * corpseName) : Mortal(maxHp, def, corpseName) {}
+npcMortal::npcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
 
 void npcMortal::die(std::shared_ptr<Entity> owner) {
 	engine.ui->message(TCODColor::lightGrey, "The %s has perished like a nerd.", owner->name);

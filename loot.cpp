@@ -39,11 +39,11 @@ void Loot::drop(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 
 // HEALER
 
-Healer::Healer(float amt) : amt(amt) {}
+Healer::Healer(int amt) : amt(amt) {}
 
 bool Healer::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	if(bearer->mortal) {
-		float amtHealed = bearer->mortal->predictHeal(amt);
+		int amtHealed = bearer->mortal->predictHeal(amt);
 		if(amtHealed > 0) return true;
 	}
 	return false;
@@ -51,9 +51,9 @@ bool Healer::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> beare
 
 void Healer::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	if(bearer->mortal) {
-		float amtHealed = bearer->mortal->heal(amt);
+		int amtHealed = bearer->mortal->heal(amt);
 		if(amtHealed > 0) { 
-			engine.ui->message(TCODColor::lightGreen, "%s heals for %g.", bearer->name, amtHealed);
+			engine.ui->message(TCODColor::lightGreen, "%s heals for %d.", bearer->name, amtHealed);
 			Loot::use(owner, bearer);
 		}
 	}
@@ -62,12 +62,12 @@ void Healer::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) 
 
 // DAMAGE SPELL
 
-DamageSpellItem::DamageSpellItem(float range, float dmg) : range(range), dmg(dmg) {}
+DamageSpellItem::DamageSpellItem(float range, int dmg) : range(range), dmg(dmg) {}
 
 
 // LIGHTNING BOLT
 
-LightningBolt::LightningBolt(float range, float dmg) : DamageSpellItem(range, dmg) {}
+LightningBolt::LightningBolt(float range, int dmg) : DamageSpellItem(range, dmg) {}
 
 bool LightningBolt::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	std::shared_ptr<Entity> closestMonster = engine.getClosestMonster(bearer->x, bearer->y, range);
@@ -79,7 +79,7 @@ void LightningBolt::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> b
 	std::shared_ptr<Entity> closestMonster = engine.getClosestMonster(bearer->x, bearer->y, range);
 	if(!closestMonster) return;
 	engine.ui->message(TCODColor::azure, "An azure bolt splits the air with a crack.");
-	engine.ui->message(TCODColor::azure, "The %s is struck for %g damage!", closestMonster->name, dmg);
+	engine.ui->message(TCODColor::azure, "The %s is struck for %d damage!", closestMonster->name, dmg);
 	closestMonster->mortal->takeDamage(closestMonster, dmg);
 	Loot::use(owner, bearer);
 }
@@ -87,7 +87,7 @@ void LightningBolt::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> b
 
 // FIREBALL
 
-Fireball::Fireball(float range, float dmg, float radius) : DamageSpellItem(range, dmg), radius(radius) {}
+Fireball::Fireball(float range, int dmg, float radius) : DamageSpellItem(range, dmg), radius(radius) {}
 
 bool Fireball::canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) {
 	engine.ui->message(TCODColor::cyan, "Left-click to cast fireball,\nor right-click to cancel.");
@@ -99,7 +99,7 @@ void Fireball::use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer
 	engine.ui->message(TCODColor::flame, "The fireball explodes burning everything in radius %g!", radius);
 	for(auto & ent : engine.activeEntities) {
 		if(ent->getDistance(x, y) <= radius) {
-			engine.ui->message(TCODColor::flame, "The %s is burned by the fireball for %g damage!", ent->name, dmg);
+			engine.ui->message(TCODColor::flame, "The %s is burned by the fireball for %d damage!", ent->name, dmg);
 			ent->mortal->takeDamage(ent, dmg);
 		}
 	}
