@@ -23,15 +23,15 @@ protected:
 
 class DamageSpell : public Spell {
 public:
-	DamageSpell(std::string name, int level, float range, float radius, float damage, const TCODColor color);
-	DamageSpell(std::string name, int level, float range, float damage, const TCODColor color);
+	DamageSpell(std::string name, int level, float range, float radius, int damage, const TCODColor color);
+	DamageSpell(std::string name, int level, float range, int damage, const TCODColor color);
 
 	bool canUse(std::shared_ptr<Entity> owner) override;
 	void use(std::shared_ptr<Entity> owner) override;
 
-	float getDamage() const;
+	int getDamage() const;
 protected:
-	float damage;
+	int damage;
 	int tx, ty;
 };
 

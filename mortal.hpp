@@ -2,28 +2,28 @@
 
 class Mortal {
 public:
-	float maxHp, hp, def;
+	int maxHp, hp;
 	const char * corpseName;
 
-	Mortal(float maxHp, float def, const char * corpseName);
+	Mortal(int maxHp, const char * corpseName);
 
 	inline bool isDead() { return hp <= 0; }
 
-	float takeDamage(std::shared_ptr<Entity> owner, float dmg);
-	float predictHeal(float amount);
-	float heal(float amount);
+	int takeDamage(std::shared_ptr<Entity> owner, int dmg);
+	int predictHeal(int amount);
+	int heal(int amount);
 
 	virtual void die(std::shared_ptr<Entity> owner);
 };
 
 class pcMortal : public Mortal {
 public:
-	pcMortal(float maxHp, float def, const char * corpseName);
+	pcMortal(int maxHp, const char * corpseName);
 	void die(std::shared_ptr<Entity> owner);
 };
 
 class npcMortal : public Mortal {
 public:
-	npcMortal(float maxHp, float def, const char * corpseName);
+	npcMortal(int maxHp, const char * corpseName);
 	void die(std::shared_ptr<Entity> owner);
 };

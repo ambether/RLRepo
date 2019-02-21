@@ -11,30 +11,31 @@ public:
 
 class Healer : public Loot {
 public:
-	float amt; // Amount of hp restored
+	int amt; // Amount of hp restored
 
-	Healer(float amt);
+	Healer(int amt);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };
 
 class DamageSpellItem : public Loot {
 public:
-	DamageSpellItem(float range, float dmg);
+	DamageSpellItem(float range, int dmg);
 protected:
-	float range, dmg;
+	float range;
+	int dmg;
 };
 
 class LightningBolt : public DamageSpellItem {
 public:
-	LightningBolt(float range, float dmg);
+	LightningBolt(float range, int dmg);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 };
 
 class Fireball : public DamageSpellItem {
 public:
-	Fireball(float range, float dmg, float radius);
+	Fireball(float range, int dmg, float radius);
 	bool canUse(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 	void use(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer);
 private:

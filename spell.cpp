@@ -27,11 +27,11 @@ std::string Spell::getName() const { return name; }
 
 // Damage spell
 
-DamageSpell::DamageSpell(std::string name, int level, float range, float radius, float damage, const TCODColor color)
+DamageSpell::DamageSpell(std::string name, int level, float range, float radius, int damage, const TCODColor color)
 	: Spell(name, level, range, radius, color),
 	damage(damage) {}
 
-DamageSpell::DamageSpell(std::string name, int level, float range, float damage, const TCODColor color)
+DamageSpell::DamageSpell(std::string name, int level, float range, int damage, const TCODColor color)
 	: Spell(name, level, range, color), 
 	damage(damage) {}
 
@@ -50,12 +50,12 @@ void DamageSpell::use(std::shared_ptr<Entity> owner) {
 	owner->spellCaster->useCharge(level);
 	for(auto & ent : engine.activeEntities) {
 		if(ent->getDistance(tx, ty) <= radius) {
-			engine.ui->message(color, "%s takes %g damage!", ent->name, damage);
+			engine.ui->message(color, "%s takes %d damage!", ent->name, damage);
 			ent->mortal->takeDamage(ent, damage);
 		}
 	}
 }
 
-float DamageSpell::getDamage() const { return damage; }
+int DamageSpell::getDamage() const { return damage; }
 
 
