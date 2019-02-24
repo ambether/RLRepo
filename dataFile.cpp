@@ -31,6 +31,9 @@ DataFile::DataFile() {
 	TCODParserStruct * interactionTypeStruct = parser->newStructure("Interaction"); // Init Interaction structure
 	entityTypeStruct->addStructure(interactionTypeStruct); // Add Interaction as a substructure to Entity
 
+	TCODParserStruct * spellCasterTypeStruct = parser->newStructure("SpellCaster"); // Init SpellCaster structure
+	entityTypeStruct->addStructure(spellCasterTypeStruct); // Add SpellCaster as a substructure to Entity
+
 	parser->run("gamedata.txt", new ParserListener(entList)); // Run the parser
 	for(auto & e : *entList) {
 		printf("inv size: %d\n", e->container ? e->container->size : 0);
@@ -68,6 +71,9 @@ bool DataFile::ParserListener::parserNewStruct(TCODParser * parser, const TCODPa
 		if(strcmp(name, "doorInteraction") == 0) {
 			currentEntity->interaction = std::make_shared<DoorInteraction>();
 		}
+	}
+	else if(strcmp(strctName, "SpellCaster") == 0) {
+		currentEntity->spellCaster = std::make_shared<SpellCaster>();
 	}
 	return true;
 }

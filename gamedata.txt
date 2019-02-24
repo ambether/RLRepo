@@ -29,6 +29,7 @@ Entity "Player" {
 		corpseName="your corpse"
 	}
 	Container { size=12 }
+	SpellCaster {} // Eventually will have properties
 }
 
 Entity "Door" {
