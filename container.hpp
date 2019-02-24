@@ -5,6 +5,7 @@ public:
 	int size; // Max container size
 	std::vector<std::shared_ptr<Entity>> inventory;
 
+	Container();
 	Container(int size);
 	~Container();
 

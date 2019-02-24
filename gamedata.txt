@@ -2,9 +2,7 @@ Entity "Boyo" {
 	symbol='B'
 	col="#90FF00"
 	blocks=true
-	Ai "mobAi" {
-		speed=100
-	}
+	Ai "mobAi" { speed=100 }
 	Combat {
 		dex=2
 		skl=1
@@ -30,4 +28,12 @@ Entity "Player" {
 		hp=30
 		corpseName="your corpse"
 	}
+	Container { size=12 }
+}
+
+Entity "Door" {
+	symbol='+'
+	col="#BF2B00"
+	blocks=true
+	Interaction "doorInteraction" {}
 }

@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+Container::Container() : size(0) {}
+
 Container::Container(int size) : size(size) {}
 
 Container::~Container() { inventory.clear(); }

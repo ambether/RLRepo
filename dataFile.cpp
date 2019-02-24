@@ -24,24 +24,16 @@ DataFile::DataFile() {
 	mortalTypeStruct->addProperty("corpseName", TCOD_TYPE_STRING, true);
 	entityTypeStruct->addStructure(mortalTypeStruct); // Add Mortal as a substructure to Entity
 
-	parser->run("gamedata.txt", new ParserListener(entList)); // Run the parser
+	TCODParserStruct * containerTypeStruct = parser->newStructure("Container"); // Init Container structure
+	containerTypeStruct->addProperty("size", TCOD_TYPE_INT, true);
+	entityTypeStruct->addStructure(containerTypeStruct); // Add Container as a substructure to Entity
 
+	TCODParserStruct * interactionTypeStruct = parser->newStructure("Interaction"); // Init Interaction structure
+	entityTypeStruct->addStructure(interactionTypeStruct); // Add Interaction as a substructure to Entity
+
+	parser->run("gamedata.txt", new ParserListener(entList)); // Run the parser
 	for(auto & e : *entList) {
-		try {
-			engine.ui->message(e->color, 
-				"Name: %s, Ch: %c, Blocks: %s, Has Ai: %s, Speed: %d\n dex: %d, skl: %d, str: %d\nhp: %d, corpse: %s",
-				e->name, 
-				e->ch, 
-				e->blocks ? "true" : "false", 
-				e->ai ? "true" : "false", 
-				e->ai ? e->ai->getSpeed() : 0,
-				e->combat ? e->combat->getDex() : 0,
-				e->combat ? e->combat->getSkl() : 0,
-				e->combat ? e->combat->getStr() : 0,
-				e->mortal ? e->mortal->maxHp : 0,
-				e->mortal->corpseName);
-		}
-		catch(...) { printf("fuck"); }
+		printf("inv size: %d\n", e->container ? e->container->size : 0);
 	}
 }
 
@@ -68,6 +60,14 @@ bool DataFile::ParserListener::parserNewStruct(TCODParser * parser, const TCODPa
 	else if(strcmp(strctName, "Mortal") == 0) {
 		if(strcmp(name, "player") == 0)		{ currentEntity->mortal = std::make_shared<pcMortal>();  }
 		else if(strcmp(name, "npc") == 0)	{ currentEntity->mortal = std::make_shared<npcMortal>(); }
+	}
+	else if(strcmp(strctName, "Container") == 0) { 
+		currentEntity->container = std::make_shared<Container>();
+	}
+	else if(strcmp(strctName, "Interaction") == 0) {
+		if(strcmp(name, "doorInteraction") == 0) {
+			currentEntity->interaction = std::make_shared<DoorInteraction>();
+		}
 	}
 	return true;
 }
@@ -100,7 +100,7 @@ bool DataFile::ParserListener::parserProperty(TCODParser * parser, const char * 
 		} 
 	}
 	else if(strcmp(name, "corpseName") == 0) { if(currentEntity->mortal) currentEntity->mortal->corpseName = _strdup(value.s); }
-	
+	else if(strcmp(name, "size") == 0) { if(currentEntity->container) currentEntity->container->size = value.i; }
 	return true;
 }
 
