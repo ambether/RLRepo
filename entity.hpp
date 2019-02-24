@@ -15,6 +15,7 @@ public:
 	std::shared_ptr<Interaction> interaction;
 	std::shared_ptr<SpellCaster> spellCaster;
 
+	Entity();
 	Entity(int x, int y, const char * name, int ch, const TCODColor & col);
 
 	void render(TCODConsole * renderConsole) const;

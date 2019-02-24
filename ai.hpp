@@ -2,9 +2,12 @@
 
 class Ai {
 public:
+	Ai();
 	Ai(int speed);
 	virtual void update(std::shared_ptr<Entity> owner) = 0;
 	void gainEnergy();
+	void setSpeed(int speed);
+	int getSpeed() const;
 protected:
 	int speed, energy;
 	void spendEnergy();
@@ -24,6 +27,7 @@ protected:
 
 class mobAi : public Ai {
 public:
+	mobAi();
 	mobAi(int speed);
 	void update(std::shared_ptr<Entity> owner);
 protected:

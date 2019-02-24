@@ -33,4 +33,6 @@ class Entity;
 #include "statScreen.hpp"
 #include "ui.hpp"
 
+#include "dataFile.hpp"
+
 #include "engine.hpp"

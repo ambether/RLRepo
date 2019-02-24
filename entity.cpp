@@ -1,6 +1,19 @@
 #include "main.hpp"
 
-Entity::Entity(int x, int y, const char * name, int ch, const TCODColor & col) 
+Entity::Entity() :
+	x(0), y(0),
+	name(""), ch(' '),
+	color(TCODColor::white),
+	blocks(false),
+	combat(nullptr),
+	mortal(nullptr),
+	ai(nullptr),
+	loot(nullptr),
+	container(nullptr),
+	interaction(nullptr),
+	spellCaster(nullptr) {}
+
+Entity::Entity(int x, int y, const char * name, int ch, const TCODColor & col)
 	: x(x), y(y), 
 	name(name), ch(ch), 
 	color(col),

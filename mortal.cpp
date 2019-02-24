@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+Mortal::Mortal() {}
+
 Mortal::Mortal(int maxHp, const char * corpseName) : maxHp(maxHp), hp(maxHp), corpseName(corpseName) {}
 
 int Mortal::takeDamage(std::shared_ptr<Entity> owner, int dmg) {
@@ -33,6 +35,8 @@ void Mortal::die(std::shared_ptr<Entity> owner) {
 }
 
 
+pcMortal::pcMortal() {}
+
 pcMortal::pcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
 
 void pcMortal::die(std::shared_ptr<Entity> owner) {
@@ -41,6 +45,8 @@ void pcMortal::die(std::shared_ptr<Entity> owner) {
 	engine.gameState = engine.LOSE;
 }
 
+
+npcMortal::npcMortal() {}
 
 npcMortal::npcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
 

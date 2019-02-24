@@ -5,6 +5,7 @@ public:
 	int maxHp, hp;
 	const char * corpseName;
 
+	Mortal();
 	Mortal(int maxHp, const char * corpseName);
 
 	inline bool isDead() { return hp <= 0; }
@@ -18,12 +19,14 @@ public:
 
 class pcMortal : public Mortal {
 public:
+	pcMortal();
 	pcMortal(int maxHp, const char * corpseName);
 	void die(std::shared_ptr<Entity> owner);
 };
 
 class npcMortal : public Mortal {
 public:
+	npcMortal();
 	npcMortal(int maxHp, const char * corpseName);
 	void die(std::shared_ptr<Entity> owner);
 };

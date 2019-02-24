@@ -2,11 +2,16 @@
 
 class Combat {
 public:
+	Combat();
 	Combat(int dexterity, int skill, int strength);
 
 	int getDex() const;
 	int getSkl() const;
 	int getStr() const;
+
+	void setDex(int dex);
+	void setSkl(int skl);
+	void setStr(int str);
 
 	void attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target);
 private:

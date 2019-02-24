@@ -1,8 +1,14 @@
 #include "main.hpp"
 
+Ai::Ai() : speed(0), energy(0) {}
+
 Ai::Ai(int speed) : speed(speed), energy(0) {}
 
 void Ai::gainEnergy() { energy += speed; }
+
+void Ai::setSpeed(int speed) { this->speed = speed; }
+
+int Ai::getSpeed() const { return speed; }
 
 void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
 
@@ -192,6 +198,8 @@ TCOD_key_t playerAi::chooseInteractDirection() const {
 
 
 static const int TRACK_TURNS(3);
+
+mobAi::mobAi() : Ai() {}
 
 mobAi::mobAi(int speed) : Ai(speed) {}
 

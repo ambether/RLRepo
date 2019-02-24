@@ -2,6 +2,8 @@
 
 //Combat::Combat(float atk) : atk(atk) {}
 
+Combat::Combat() : dexterity(0), skill(0), strength(0) {}
+
 Combat::Combat(int dexterity, int skill, int strength) : dexterity(dexterity), skill(skill), strength(strength) {}
 
 int Combat::getDex() const { return dexterity; }
@@ -9,6 +11,12 @@ int Combat::getDex() const { return dexterity; }
 int Combat::getSkl() const { return skill; }
 
 int Combat::getStr() const { return strength; }
+
+void Combat::setDex(int dex) { dexterity = dex; }
+
+void Combat::setSkl(int skl) { skill = skl; }
+
+void Combat::setStr(int str) { strength = str; }
 
 void Combat::attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target) {
 	// Attackers start with a 40% chance to hit. The chance goes up by 5% for each point of SKL they have.
