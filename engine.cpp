@@ -27,8 +27,8 @@ Engine::~Engine() {
 	deaths.clear();
 }
 
-std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
-	std::shared_ptr<Entity> closest = NULL;
+shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
+	shared_ptr<Entity> closest = NULL;
 	float bestDist = 1E6f;
 	for(auto & ent : activeEntities) {
 		if(ent != player) {
@@ -42,7 +42,7 @@ std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) con
 	return closest;
 }
 
-std::shared_ptr<Entity> Engine::getMonster(int x, int y) const {
+shared_ptr<Entity> Engine::getMonster(int x, int y) const {
 	for(auto & ent : activeEntities) {
 		if(ent->x == x && ent->y == y) { return ent; }
 	}
@@ -118,9 +118,9 @@ void Engine::render() {
 	ui->render();
 }
 
-void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
+void Engine::notifyDeath(shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
 
-void Engine::addAction(std::shared_ptr<Action> action) { actionQueue.addAction(action); }
+void Engine::addAction(shared_ptr<Action> action) { actionQueue.addAction(action); }
 
 void Engine::setComputeFov(bool value) { computeFov = value; }
 

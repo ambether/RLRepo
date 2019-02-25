@@ -13,7 +13,7 @@ public:
 	void setSkl(int skl);
 	void setStr(int str);
 
-	void attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target);
+	void attack(shared_ptr<Entity> attacker, shared_ptr<Entity> target);
 private:
 	int dexterity,	// DEX
 		skill,		// SKL

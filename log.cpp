@@ -34,7 +34,7 @@ void Log::message(const TCODColor & col, char text[128]) {
 		if(size(log) == height - 2) { log.erase(begin(log)); }
 		lineEnd = strchr(lineBegin, '\n');
 		if(lineEnd) { *lineEnd = '\0'; }
-		std::shared_ptr<Message> msg = std::make_shared<Message>(lineBegin, col);
+		shared_ptr<Message> msg = std::make_shared<Message>(lineBegin, col);
 		log.push_back(msg);
 		lineBegin = lineEnd + 1;
 	} while(lineEnd);

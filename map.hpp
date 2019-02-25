@@ -36,9 +36,9 @@ private:
 
 	int width, height;
 	Tile * tiles;
-	std::shared_ptr<TCODMap> map;
+	shared_ptr<TCODMap> map;
 
-	std::vector<RoomData> rooms;
+	vector<RoomData> rooms;
 
 	friend class bspList;
 	

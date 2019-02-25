@@ -1,22 +1,21 @@
 #pragma once
 
-using std::shared_ptr;
-using std::vector;
-
 class DataFile {
 
 public:
 	DataFile();
 
-	std::shared_ptr<TCODParser> parser;
+	void parseEntities();
+
+	shared_ptr<TCODParser> parser;
 private:
 	shared_ptr<vector<shared_ptr<Entity>>> entList;
-	class ParserListener;
+	class EntityParserListener;
 };
 
-class DataFile::ParserListener : public ITCODParserListener {
+class DataFile::EntityParserListener : public ITCODParserListener {
 public:
-	ParserListener(shared_ptr<vector<shared_ptr<Entity>>> entList);
+	EntityParserListener(shared_ptr<vector<shared_ptr<Entity>>> entList);
 	bool parserNewStruct(TCODParser * parser, const TCODParserStruct * str, const char * name);
 	bool parserFlag(TCODParser * parser, const char * name);
 	bool parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value);

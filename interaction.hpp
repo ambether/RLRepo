@@ -2,7 +2,7 @@
 
 class Interaction {
 public:
-	virtual void interact(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter) = 0;
+	virtual void interact(shared_ptr<Entity> owner, shared_ptr<Entity> interacter) = 0;
 	const char * getInteractVerb() const;
 protected:
 	const char * interactVerb;
@@ -11,7 +11,7 @@ protected:
 class DoorInteraction : public Interaction {
 public:
 	DoorInteraction();
-	void interact(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter);
+	void interact(shared_ptr<Entity> owner, shared_ptr<Entity> interacter);
 private:
 	static const int OPEN_CHAR = '\'', CLOSED_CHAR = '+';
 	bool open;

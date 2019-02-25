@@ -13,6 +13,6 @@ private:
 		Message(const char * text, const TCODColor & col) : text(_strdup(text)), col(col) {}
 		~Message() { delete text; }
 	};
-	std::vector<std::shared_ptr<Message>> log;
+	vector<shared_ptr<Message>> log;
 	static const int msgX = 2;
 };

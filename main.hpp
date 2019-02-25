@@ -10,6 +10,9 @@
 
 #include "libtcod.hpp"
 
+using std::shared_ptr;
+using std::vector;
+
 class Entity;
 
 #include "spell.hpp"

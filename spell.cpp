@@ -35,7 +35,7 @@ DamageSpell::DamageSpell(std::string name, int level, float range, int damage, c
 	: Spell(name, level, range, color), 
 	damage(damage) {}
 
-bool DamageSpell::canUse(std::shared_ptr<Entity> owner) {
+bool DamageSpell::canUse(shared_ptr<Entity> owner) {
 	if(owner->spellCaster->getCharges(level) > 0) {
 		engine.ui->message(TCODColor::cyan, "Left-click on an enemy to cast %s\nor right-click to cancel.", name.c_str());
 		if(!engine.pickTile(&tx, &ty, range, radius)) return false;
@@ -46,7 +46,7 @@ bool DamageSpell::canUse(std::shared_ptr<Entity> owner) {
 	return false;
 }
 
-void DamageSpell::use(std::shared_ptr<Entity> owner) {
+void DamageSpell::use(shared_ptr<Entity> owner) {
 	owner->spellCaster->useCharge(level);
 	for(auto & ent : engine.activeEntities) {
 		if(ent->getDistance(tx, ty) <= radius) {

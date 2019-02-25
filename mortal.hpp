@@ -10,23 +10,23 @@ public:
 
 	inline bool isDead() { return hp <= 0; }
 
-	int takeDamage(std::shared_ptr<Entity> owner, int dmg);
+	int takeDamage(shared_ptr<Entity> owner, int dmg);
 	int predictHeal(int amount);
 	int heal(int amount);
 
-	virtual void die(std::shared_ptr<Entity> owner);
+	virtual void die(shared_ptr<Entity> owner);
 };
 
 class pcMortal : public Mortal {
 public:
 	pcMortal();
 	pcMortal(int maxHp, const char * corpseName);
-	void die(std::shared_ptr<Entity> owner);
+	void die(shared_ptr<Entity> owner);
 };
 
 class npcMortal : public Mortal {
 public:
 	npcMortal();
 	npcMortal(int maxHp, const char * corpseName);
-	void die(std::shared_ptr<Entity> owner);
+	void die(shared_ptr<Entity> owner);
 };

@@ -3,7 +3,9 @@
 DataFile::DataFile() {
 	entList = std::make_shared<vector<shared_ptr<Entity>>>();
 	parser = std::make_shared<TCODParser>();
+}
 
+void DataFile::parseEntities() {
 	TCODParserStruct * entityTypeStruct = parser->newStructure("Entity"); // Init Entity structure
 	entityTypeStruct->addProperty("symbol", TCOD_TYPE_CHAR, true);
 	entityTypeStruct->addProperty("col", TCOD_TYPE_COLOR, true);
@@ -34,7 +36,7 @@ DataFile::DataFile() {
 	TCODParserStruct * spellCasterTypeStruct = parser->newStructure("SpellCaster"); // Init SpellCaster structure
 	entityTypeStruct->addStructure(spellCasterTypeStruct); // Add SpellCaster as a substructure to Entity
 
-	parser->run("gamedata.txt", new ParserListener(entList)); // Run the parser
+	parser->run("gamedata.txt", new EntityParserListener(entList)); // Run the parser
 	for(auto & e : *entList) {
 		printf("inv size: %d\n", e->container ? e->container->size : 0);
 	}
@@ -43,9 +45,9 @@ DataFile::DataFile() {
 
 // ParserListener
 
-DataFile::ParserListener::ParserListener(shared_ptr<vector<shared_ptr<Entity>>> entList) : entList(entList) {}
+DataFile::EntityParserListener::EntityParserListener(shared_ptr<vector<shared_ptr<Entity>>> entList) : entList(entList) {}
 
-bool DataFile::ParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+bool DataFile::EntityParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
 	//engine.ui->message(TCODColor::lightGrey, "New structure, type %s with name %s", strct->getName(), name ? name : "NULL");
 	const char * strctName = strct->getName();
 	if(strcmp(strctName, "Entity") == 0) {
@@ -78,12 +80,12 @@ bool DataFile::ParserListener::parserNewStruct(TCODParser * parser, const TCODPa
 	return true;
 }
 
-bool DataFile::ParserListener::parserFlag(TCODParser * parser, const char * name) {
+bool DataFile::EntityParserListener::parserFlag(TCODParser * parser, const char * name) {
 	//engine.ui->message(TCODColor::lightGrey, "found new flag %s", name);
 	return true;
 }
 
-bool DataFile::ParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
+bool DataFile::EntityParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
 	//engine.ui->message(TCODColor::lightGrey, "found new property %s", name);
 	// Base Entity properties
 	if(strcmp(name, "symbol") == 0) { currentEntity->ch = value.c; }
@@ -110,12 +112,12 @@ bool DataFile::ParserListener::parserProperty(TCODParser * parser, const char * 
 	return true;
 }
 
-bool DataFile::ParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+bool DataFile::EntityParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
 	//engine.ui->message(TCODColor::lightGrey, "end of structure %s", name);
 	return true;
 }
 
-void DataFile::ParserListener::error(const char * msg) {
+void DataFile::EntityParserListener::error(const char * msg) {
 	fprintf(stderr, msg);
 	exit(1);
 }

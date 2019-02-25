@@ -1,9 +1,9 @@
 #include "main.hpp"
 
-Action::ActionResult::ActionResult(std::shared_ptr<Action> alternate) : alternate(alternate) {}
+Action::ActionResult::ActionResult(shared_ptr<Action> alternate) : alternate(alternate) {}
 
 
-MoveAction::MoveAction(std::shared_ptr<Entity> owner, int dx, int dy) : owner(owner), dx(dx), dy(dy) {}
+MoveAction::MoveAction(shared_ptr<Entity> owner, int dx, int dy) : owner(owner), dx(dx), dy(dy) {}
 
 Action::ActionResult MoveAction::execute() {
 	for(auto & ent : engine.entityList) {
@@ -25,7 +25,7 @@ Action::ActionResult MoveAction::execute() {
 }
 
 
-AttackAction::AttackAction(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target) : attacker(attacker), target(target) {}
+AttackAction::AttackAction(shared_ptr<Entity> attacker, shared_ptr<Entity> target) : attacker(attacker), target(target) {}
 
 Action::ActionResult AttackAction::execute() { 
 	attacker->combat->attack(attacker, target); 
@@ -33,12 +33,12 @@ Action::ActionResult AttackAction::execute() {
 }
 
 
-IdleAction::IdleAction(std::shared_ptr<Entity> owner) : owner(owner) {}
+IdleAction::IdleAction(shared_ptr<Entity> owner) : owner(owner) {}
 
 Action::ActionResult IdleAction::execute() { return ActionResult(); }
 
 
-MoveAtPlayerAction::MoveAtPlayerAction(std::shared_ptr<Entity> owner) : owner(owner) {}
+MoveAtPlayerAction::MoveAtPlayerAction(shared_ptr<Entity> owner) : owner(owner) {}
 
 Action::ActionResult MoveAtPlayerAction::execute() {
 	int dx = engine.player->x - owner->x,
@@ -64,7 +64,7 @@ Action::ActionResult MoveAtPlayerAction::execute() {
 }
 
 
-CollectAction::CollectAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
+CollectAction::CollectAction(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
 
 Action::ActionResult CollectAction::execute() {
 	if(owner->loot->collect(owner, bearer)) { engine.ui->message(TCODColor::lightGrey, "%s collects the %s.", bearer->name, owner->name); }
@@ -72,7 +72,7 @@ Action::ActionResult CollectAction::execute() {
 }
 
 
-UseAction::UseAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
+UseAction::UseAction(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) : owner(owner), bearer(bearer) {}
 
 Action::ActionResult UseAction::execute() {
 	owner->loot->use(owner, bearer);
@@ -81,7 +81,7 @@ Action::ActionResult UseAction::execute() {
 }
 
 
-InteractAction::InteractAction(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter)
+InteractAction::InteractAction(shared_ptr<Entity> owner, shared_ptr<Entity> interacter)
 	: owner(owner), 
 	interacter(interacter) {}
 
@@ -92,7 +92,7 @@ Action::ActionResult InteractAction::execute() {
 }
 
 
-CastAction::CastAction(std::shared_ptr<Spell> spell, std::shared_ptr<Entity> caster) : spell(spell), caster(caster) {}
+CastAction::CastAction(shared_ptr<Spell> spell, shared_ptr<Entity> caster) : spell(spell), caster(caster) {}
 
 Action::ActionResult CastAction::execute() {
 	engine.ui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->getName().c_str());

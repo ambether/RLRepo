@@ -83,17 +83,17 @@ void Map::render(TCODConsole * renderConsole) const {
 
 void Map::addMonster(int x, int y) {
 	std::random_device seed;
-	std::shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
+	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
 	int roll = rng->getInt(1, 100);
 	if(roll < 80) {
-		std::shared_ptr<Entity> gobbo = std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen);
+		shared_ptr<Entity> gobbo = std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen);
 		gobbo->mortal = std::make_shared<Mortal>(15, "dead gobbo");
 		gobbo->combat = std::make_shared<Combat>(1, 1, 5);
 		gobbo->ai = std::make_shared<mobAi>(50);
 		engine.entityList.push_back(gobbo); engine.activeEntities.push_back(gobbo);
 	}
 	else {
-		std::shared_ptr<Entity> hobbo = std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange);
+		shared_ptr<Entity> hobbo = std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange);
 		hobbo->mortal = std::make_shared<Mortal>(20, "dead hobbo");
 		hobbo->combat = std::make_shared<Combat>(4, 3, 6); 
 		hobbo->ai = std::make_shared<mobAi>(150);
@@ -102,7 +102,7 @@ void Map::addMonster(int x, int y) {
 }
 
 void Map::addDoor(int x, int y) {
-	std::shared_ptr<Entity> door = std::make_shared<Entity>(x, y, "door", '+', TCODColor::darkAmber);
+	shared_ptr<Entity> door = std::make_shared<Entity>(x, y, "door", '+', TCODColor::darkAmber);
 	door->interaction = std::make_shared<DoorInteraction>();
 	setTransparent(x, y, false);
 	engine.entityList.push_back(door); engine.inactiveEntities.push_back(door);
@@ -199,25 +199,25 @@ void Map::createRoom(bool first, int x1, int y1, int x2, int y2) {
 
 void Map::addItem(int x, int y) {
 	std::random_device seed;
-	std::shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
+	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
 	int roll = rng->getInt(1, 100);
 	if(roll < 70) {
-		std::shared_ptr<Entity> healPotion = std::make_shared<Entity>(x, y, "Healing Potion", '!',  TCODColor::crimson);
+		shared_ptr<Entity> healPotion = std::make_shared<Entity>(x, y, "Healing Potion", '!',  TCODColor::crimson);
 		healPotion->blocks = false; healPotion->loot = std::make_shared<Healer>(4);
 		engine.entityList.push_back(healPotion); engine.inactiveEntities.push_back(healPotion);
 	}
 	else if(roll < 70 + 10) {
-		std::shared_ptr<Entity> lBoltScroll = std::make_shared<Entity>(x, y, "Lightning Bolt Scroll", '#', TCODColor::azure);
+		shared_ptr<Entity> lBoltScroll = std::make_shared<Entity>(x, y, "Lightning Bolt Scroll", '#', TCODColor::azure);
 		lBoltScroll->blocks = false; lBoltScroll->loot = std::make_shared<LightningBolt>(5.0f, 20);
 		engine.entityList.push_back(lBoltScroll); engine.inactiveEntities.push_back(lBoltScroll);
 	}
 	else if(roll < 70 + 10 + 10) {
-		std::shared_ptr<Entity> fBallScroll = std::make_shared<Entity>(x, y, "Fireball Scroll", '#',  TCODColor::flame);
+		shared_ptr<Entity> fBallScroll = std::make_shared<Entity>(x, y, "Fireball Scroll", '#',  TCODColor::flame);
 		fBallScroll->blocks = false; fBallScroll->loot = std::make_shared<Fireball>(8.0f, 12, 3.0f);
 		engine.entityList.push_back(fBallScroll); engine.inactiveEntities.push_back(fBallScroll);
 	}
 	else {
-		//std::shared_ptr<Ent> ConfusionScroll = std::make_shared<Ent>(x, y, '#', "Confusion Scroll", TCODColor::lightGreen);
+		//shared_ptr<Ent> ConfusionScroll = std::make_shared<Ent>(x, y, '#', "Confusion Scroll", TCODColor::lightGreen);
 		//ConfusionScroll->blocks = false; ConfusionScroll->loot = std::make_shared<Confuser>(10, 8);
 		//engine.entL.push_back(ConfusionScroll);
 	}

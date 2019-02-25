@@ -5,7 +5,7 @@ const char * Interaction::getInteractVerb() const { return interactVerb; }
 
 DoorInteraction::DoorInteraction() : open(false) { interactVerb = "opens"; }
 
-void DoorInteraction::interact(std::shared_ptr<Entity> owner, std::shared_ptr<Entity> interacter) {
+void DoorInteraction::interact(shared_ptr<Entity> owner, shared_ptr<Entity> interacter) {
 	open = !open; // Swaps the state of the door's open-ness
 	if(open) { // Opens the door
 		owner->blocks = false; 

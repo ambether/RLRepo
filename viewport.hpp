@@ -6,10 +6,10 @@ public:
 	~Viewport();
 	
 	void render() const override;
-	void renderMap(std::shared_ptr<Map> map);
-	void renderEntity(std::shared_ptr<Entity> entity);
+	void renderMap(shared_ptr<Map> map);
+	void renderEntity(shared_ptr<Entity> entity);
 	void clear();
-	void moveView(std::shared_ptr<Entity> & centeredOn);
+	void moveView(shared_ptr<Entity> & centeredOn);
 
 	int getOffsetX() const;
 	int getOffsetY() const;
@@ -27,5 +27,5 @@ private:
 	int const halfViewWidth, halfviewHeight,
 		diffWidth, diffHeight;
 
-	void calculateView(std::shared_ptr<Entity> & centeredOn);
+	void calculateView(shared_ptr<Entity> & centeredOn);
 };

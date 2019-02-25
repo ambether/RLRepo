@@ -31,7 +31,7 @@ void Entity::render(TCODConsole * renderConsole) const {
 	renderConsole->setCharForeground(x, y, color);
 }
 
-void Entity::update(std::shared_ptr<Entity> owner) { if(ai) ai->update(owner); }
+void Entity::update(shared_ptr<Entity> owner) { if(ai) ai->update(owner); }
 
 void Entity::gainEnergy() { if(ai) ai->gainEnergy(); }
 
