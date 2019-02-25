@@ -4,10 +4,12 @@
 
 DataFile::DataFile() {
 	entList = vector<shared_ptr<Entity>>();
-	parser = std::make_shared<TCODParser>();
+	itemList = vector<shared_ptr<Entity>>();
 }
 
 void DataFile::parseEntities() {
+	parser = std::make_shared<TCODParser>();
+
 	TCODParserStruct * entityTypeStruct = parser->newStructure("Entity"); // Init Entity structure
 	entityTypeStruct->addProperty("symbol", TCOD_TYPE_CHAR, true);
 	entityTypeStruct->addProperty("col", TCOD_TYPE_COLOR, true);
@@ -38,10 +40,32 @@ void DataFile::parseEntities() {
 	TCODParserStruct * spellCasterTypeStruct = parser->newStructure("SpellCaster"); // Init SpellCaster structure
 	entityTypeStruct->addStructure(spellCasterTypeStruct); // Add SpellCaster as a substructure to Entity
 
-	parser->run("entdata.txt", new EntityParserListener(&entList)); // Run the parser
-	for(auto & e : entList) {
-		printf("inv size: %d\n", e->container ? e->container->size : 0);
+	try {
+		parser->run("entdata.txt", new EntityParserListener(&entList)); // Run the parser
 	}
+	catch(std::exception & e) { fprintf(stderr, e.what()); }
+}
+
+void DataFile::parseItems() {
+	parser = std::make_shared<TCODParser>();
+
+	TCODParserStruct * itemTypeStruct = parser->newStructure("Item"); // Init Item structure
+	itemTypeStruct->addProperty("symbol", TCOD_TYPE_CHAR, true);
+	itemTypeStruct->addProperty("col", TCOD_TYPE_COLOR, true);
+
+	TCODParserStruct * healerTypeStruct = parser->newStructure("Healer"); // Init Healer structure
+	healerTypeStruct->addProperty("amt", TCOD_TYPE_INT, true);
+	itemTypeStruct->addStructure(healerTypeStruct); // Add Healer as a substructure to Item
+
+	TCODParserStruct * damageSpellTypeStruct = parser->newStructure("DamageSpell"); // Init Damage Spell Structure
+	damageSpellTypeStruct->addProperty("range", TCOD_TYPE_FLOAT, true);
+	damageSpellTypeStruct->addProperty("dmg", TCOD_TYPE_INT, true);
+	damageSpellTypeStruct->addProperty("radius", TCOD_TYPE_FLOAT, false);
+	itemTypeStruct->addStructure(damageSpellTypeStruct); // Add DamageSpell as a substructure to Item
+	try {
+		parser->run("itemdata.txt", new ItemParserListener(&itemList));
+	}
+	catch(std::exception & e) { fprintf(stderr, e.what()); }
 }
 
 
@@ -50,7 +74,6 @@ void DataFile::parseEntities() {
 DataFile::EntityParserListener::EntityParserListener(vector<shared_ptr<Entity>> * entList) : entList(entList) {}
 
 bool DataFile::EntityParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
-	//engine.ui->message(TCODColor::lightGrey, "New structure, type %s with name %s", strct->getName(), name ? name : "NULL");
 	const char * strctName = strct->getName();
 	if(strcmp(strctName, "Entity") == 0) {
 		currentEntity = std::make_shared<Entity>();
@@ -78,17 +101,13 @@ bool DataFile::EntityParserListener::parserNewStruct(TCODParser * parser, const 
 	}
 	else if(strcmp(strctName, "SpellCaster") == 0) {
 		currentEntity->spellCaster = std::make_shared<SpellCaster>();
-	}
+	}	
 	return true;
 }
 
-bool DataFile::EntityParserListener::parserFlag(TCODParser * parser, const char * name) {
-	//engine.ui->message(TCODColor::lightGrey, "found new flag %s", name);
-	return true;
-}
+bool DataFile::EntityParserListener::parserFlag(TCODParser * parser, const char * name) { return true; }
 
 bool DataFile::EntityParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
-	//engine.ui->message(TCODColor::lightGrey, "found new property %s", name);
 	// Base Entity properties
 	if(strcmp(name, "symbol") == 0) { currentEntity->ch = value.c; }
 	else if(strcmp(name, "col") == 0) { currentEntity->color = value.col; }
@@ -111,17 +130,15 @@ bool DataFile::EntityParserListener::parserProperty(TCODParser * parser, const c
 	}
 	else if(strcmp(name, "corpseName") == 0) { if(currentEntity->mortal) currentEntity->mortal->corpseName = _strdup(value.s); }
 	else if(strcmp(name, "size") == 0) { if(currentEntity->container) currentEntity->container->size = value.i; }
+	
 	return true;
 }
 
-bool DataFile::EntityParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
-	//engine.ui->message(TCODColor::lightGrey, "end of structure %s", name);
-	return true;
-}
+bool DataFile::EntityParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) { return true; }
 
 void DataFile::EntityParserListener::error(const char * msg) {
-	fprintf(stderr, msg);
-	exit(1);
+	fprintf(stderr, "In EntityParserListener:\n");
+	throw(std::exception(msg));
 }
 
 
@@ -129,20 +146,63 @@ void DataFile::EntityParserListener::error(const char * msg) {
 
 DataFile::ItemParserListener::ItemParserListener(vector<shared_ptr<Entity>> * itemList) : itemList(itemList) {}
 
-bool DataFile::ItemParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * str, const char * name) {
-	return false;
+DataFile::ItemParserListener::~ItemParserListener() {
+	delete damageSpellData;
+	delete healerData;
 }
 
-bool DataFile::ItemParserListener::parserFlag(TCODParser * parser, const char * name) {
-	return false;
+bool DataFile::ItemParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+	const char * strctName = strct->getName();
+	if(strcmp(strctName, "Item") == 0) {
+		currentItem = std::make_shared<Entity>();
+		currentItem->name = _strdup(name);
+		currentItem->blocks = false;
+		itemList->emplace_back(currentItem);
+	}
+	else if(strcmp(strctName, "Healer") == 0) {
+		healerData = new _HealerData();
+	}
+	else if(strcmp(strctName, "DamageSpell") == 0) {
+		damageSpellData = new _DamageSpellItemData();
+	}
+	return true;
 }
+
+bool DataFile::ItemParserListener::parserFlag(TCODParser * parser, const char * name) { return true; }
 
 bool DataFile::ItemParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
-	return false;
+	// Base Item properties
+	if(strcmp(name, "symbol") == 0) { currentItem->ch = value.c; }
+	else if(strcmp(name, "col") == 0) { currentItem->color = value.col; }
+	
+	// Healer properties
+	else if(strcmp(name, "amt") == 0) { healerData->amt = value.i; }
+	
+	// DamageSpell properties
+	else if(strcmp(name, "range") == 0) { damageSpellData->range = value.f; }
+	else if(strcmp(name, "dmg") == 0) { damageSpellData->dmg = value.i; }
+	else if(strcmp(name, "radius") == 0) { damageSpellData->radius = value.f; }
+
+	return true;
 }
 
-bool DataFile::ItemParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * str, const char * name) {
-	return false;
+bool DataFile::ItemParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+	const char * strctName = strct->getName();
+	if(strcmp(strctName, "Healer") == 0 && healerData) {
+		currentItem->loot = std::make_shared<Healer>(healerData->amt);
+	}
+	else if(strcmp(strctName, "DamageSpell") == 0 && damageSpellData) { // Eventually rewrite the part for more generic scrolls
+		if(strcmp(currentItem->name, "Lightning Bolt Scroll") == 0) {
+			currentItem->loot = std::make_shared<LightningBolt>(damageSpellData->range, damageSpellData->dmg);
+		}
+		else if(strcmp(currentItem->name, "Fireball Scroll") == 0) {
+			currentItem->loot = std::make_shared<Fireball>(damageSpellData->range, damageSpellData->dmg, damageSpellData->radius);
+		}
+	}
+	return true;
 }
 
-void DataFile::ItemParserListener::error(const char * msg) {}
+void DataFile::ItemParserListener::error(const char * msg) {
+	fprintf(stderr, "In ItemParserListener:\n");
+	throw(std::exception(msg));
+}

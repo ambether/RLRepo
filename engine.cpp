@@ -18,6 +18,7 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 
 	DataFile * df = new DataFile();
 	df->parseEntities();
+	df->parseItems();
 	delete df;
 }
 

@@ -62,7 +62,7 @@ void Healer::use(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 
 // DAMAGE SPELL
 
-DamageSpellItem::DamageSpellItem(float range, int dmg) : range(range), dmg(dmg) {}
+DamageSpellItem::DamageSpellItem(float range, int dmg, float radius) : range(range), dmg(dmg), radius(radius) {}
 
 
 // LIGHTNING BOLT
@@ -87,7 +87,7 @@ void LightningBolt::use(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 
 // FIREBALL
 
-Fireball::Fireball(float range, int dmg, float radius) : DamageSpellItem(range, dmg), radius(radius) {}
+Fireball::Fireball(float range, int dmg, float radius) : DamageSpellItem(range, dmg, radius) {}
 
 bool Fireball::canUse(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 	engine.ui->message(TCODColor::cyan, "Left-click to cast fireball,\nor right-click to cancel.");

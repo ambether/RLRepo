@@ -11,19 +11,20 @@ public:
 
 class Healer : public Loot {
 public:
-	int amt; // Amount of hp restored
-
 	Healer(int amt);
 	bool canUse(shared_ptr<Entity> owner, shared_ptr<Entity> bearer);
 	void use(shared_ptr<Entity> owner, shared_ptr<Entity> bearer);
+private:
+	int amt; // Amount of hp restored
 };
 
-class DamageSpellItem : public Loot {
+class DamageSpellItem : public Loot { // Eventually rewrite for more generic scrolls; i.e. flags for targeting type.
 public:
-	DamageSpellItem(float range, int dmg);
+	DamageSpellItem(float range, int dmg, float radius = 0.0);
 protected:
 	float range;
 	int dmg;
+	float radius;
 };
 
 class LightningBolt : public DamageSpellItem {

@@ -1,40 +1,24 @@
-Entity "Boyo" {
-	symbol='B'
-	col="#90FF00"
-	blocks=true
-	Ai "mobAi" { speed=100 }
-	Combat {
-		dex=2
-		skl=1
-		str=3
-	}
-	Mortal "npc" {
-		hp=12
-		corpseName="dead Boyo"
+Item "Healing Potion" {
+	symbol='!'
+	col="255,0,63" // crimson
+	Healer { amt=4 }
+}
+
+Item "Lightning Bolt Scroll" {
+	symbol='#'
+	col="0,127,255" // azure
+	DamageSpell {
+		range=5.0
+		dmg=20
 	}
 }
 
-Entity "Player" {
-	symbol='@'
-	col="#FF0000"
-	blocks=true
-	Ai "playerAi" {}
-	Combat {
-		dex=1
-		skl=1
-		str=1
+Item "Fireball Scroll" {
+	symbol='#'
+	col="255,63,0" // flame
+	DamageSpell {
+		range=8.0
+		dmg=12
+		radius=3.0
 	}
-	Mortal "player" {
-		hp=30
-		corpseName="your corpse"
-	}
-	Container { size=12 }
-	SpellCaster {} // Eventually will have properties
-}
-
-Entity "Door" {
-	symbol='+'
-	col="#BF2B00"
-	blocks=true
-	Interaction "doorInteraction" {}
 }
