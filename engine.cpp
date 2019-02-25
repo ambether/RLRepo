@@ -17,6 +17,8 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	ui->message(TCODColor::red, "Whalecum nerd.");
 
 	DataFile * df = new DataFile();
+	df->parseEntities();
+	delete df;
 }
 
 Engine::~Engine() {

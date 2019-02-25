@@ -1,7 +1,9 @@
 #include "main.hpp"
 
+// DataFile
+
 DataFile::DataFile() {
-	entList = std::make_shared<vector<shared_ptr<Entity>>>();
+	entList = vector<shared_ptr<Entity>>();
 	parser = std::make_shared<TCODParser>();
 }
 
@@ -36,16 +38,16 @@ void DataFile::parseEntities() {
 	TCODParserStruct * spellCasterTypeStruct = parser->newStructure("SpellCaster"); // Init SpellCaster structure
 	entityTypeStruct->addStructure(spellCasterTypeStruct); // Add SpellCaster as a substructure to Entity
 
-	parser->run("gamedata.txt", new EntityParserListener(entList)); // Run the parser
-	for(auto & e : *entList) {
+	parser->run("entdata.txt", new EntityParserListener(&entList)); // Run the parser
+	for(auto & e : entList) {
 		printf("inv size: %d\n", e->container ? e->container->size : 0);
 	}
 }
 
 
-// ParserListener
+// EntityParserListener
 
-DataFile::EntityParserListener::EntityParserListener(shared_ptr<vector<shared_ptr<Entity>>> entList) : entList(entList) {}
+DataFile::EntityParserListener::EntityParserListener(vector<shared_ptr<Entity>> * entList) : entList(entList) {}
 
 bool DataFile::EntityParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
 	//engine.ui->message(TCODColor::lightGrey, "New structure, type %s with name %s", strct->getName(), name ? name : "NULL");
@@ -121,3 +123,26 @@ void DataFile::EntityParserListener::error(const char * msg) {
 	fprintf(stderr, msg);
 	exit(1);
 }
+
+
+// ItemParserListener
+
+DataFile::ItemParserListener::ItemParserListener(vector<shared_ptr<Entity>> * itemList) : itemList(itemList) {}
+
+bool DataFile::ItemParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * str, const char * name) {
+	return false;
+}
+
+bool DataFile::ItemParserListener::parserFlag(TCODParser * parser, const char * name) {
+	return false;
+}
+
+bool DataFile::ItemParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
+	return false;
+}
+
+bool DataFile::ItemParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * str, const char * name) {
+	return false;
+}
+
+void DataFile::ItemParserListener::error(const char * msg) {}
