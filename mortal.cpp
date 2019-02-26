@@ -45,6 +45,10 @@ pcMortal::pcMortal() {}
 
 pcMortal::pcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
 
+shared_ptr<Mortal> pcMortal::clone() const {
+	return std::make_shared<pcMortal>(*this);
+}
+
 void pcMortal::die(shared_ptr<Entity> owner) {
 	engine.ui->message(TCODColor::red, "You've been slain nerd.");
 	Mortal::die(owner);
@@ -55,6 +59,10 @@ void pcMortal::die(shared_ptr<Entity> owner) {
 npcMortal::npcMortal() {}
 
 npcMortal::npcMortal(int maxHp, const char * corpseName) : Mortal(maxHp, corpseName) {}
+
+shared_ptr<Mortal> npcMortal::clone() const {
+	return std::make_shared<npcMortal>(*this);
+}
 
 void npcMortal::die(shared_ptr<Entity> owner) {
 	engine.ui->message(TCODColor::lightGrey, "The %s has perished like a nerd.", owner->name);

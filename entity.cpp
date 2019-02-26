@@ -50,9 +50,9 @@ shared_ptr<Entity> Entity::clone() const {
 	cpy->color = color;
 	cpy->blocks = blocks;
 
-	// ai, loot, and interaction have to be cloned because they are polymorphic
+	// mortal, ai, loot, and interaction have to be cloned because they are polymorphic
 	if(combat)		{ cpy->combat = std::make_shared<Combat>(*combat); }
-	if(mortal)		{ cpy->mortal = std::make_shared<Mortal>(*mortal); }
+	if(mortal)		{ cpy->mortal = mortal->clone(); }
 	if(ai)			{ cpy->ai = ai->clone(); }
 	if(loot)		{ cpy->loot = loot->clone(); }
 	if(container)	{ cpy->container = std::make_shared<Container>(*container); }

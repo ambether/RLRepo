@@ -1,35 +1,51 @@
-Entity "Boyo" {
-	symbol='B'
-	col="#90FF00"
-	blocks=true
-	Ai "mobAi" { speed=100 }
-	Combat {
-		dex=2
-		skl=1
-		str=3
-	}
-	Mortal "npc" {
-		hp=12
-		corpseName="dead Boyo"
-	}
-}
-
 Entity "Player" {
 	symbol='@'
-	col="#FF0000"
+	col="255,255,255" // white
 	blocks=true
+	Mortal "player" {
+		hp=30
+		corpseName="your lifeless corpse"
+	}
+	Combat {
+		dex=1
+		skl=3
+		str=10
+	}
 	Ai "playerAi" {}
+	Container { size=10 }
+	SpellCaster {} // Eventually will have properties
+}
+
+Entity "Gobbo" {
+	symbol='g'
+	col="64,128,64" // desaturated green
+	blocks=true
+	Mortal "npc" {
+		hp=15
+		corpseName="dead Gobbo"
+	}
 	Combat {
 		dex=1
 		skl=1
-		str=1
+		str=5
 	}
-	Mortal "player" {
-		hp=30
-		corpseName="your corpse"
+	Ai "mobAi" { speed=50 }
+}
+
+Entity "Hobbo" {
+	symbol='h'
+	col="191,95,0" // dark orange
+	blocks=true
+	Mortal "npc" {
+		hp=20
+		corpseName="dead Hobbo"
 	}
-	Container { size=12 }
-	SpellCaster {} // Eventually will have properties
+	Combat {
+		dex=4
+		skl=3
+		str=6
+	}
+	Ai "mobAi" { speed=150 }
 }
 
 Entity "Door" {

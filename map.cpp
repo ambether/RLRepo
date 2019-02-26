@@ -85,19 +85,19 @@ void Map::addMonster(int x, int y) {
 	std::random_device seed;
 	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
 	int roll = rng->getInt(1, 100);
-	if(roll < 80) {
-		shared_ptr<Entity> gobbo = std::make_shared<Entity>(x, y, "Gobbo", 'g', TCODColor::desaturatedGreen);
-		gobbo->mortal = std::make_shared<Mortal>(15, "dead gobbo");
-		gobbo->combat = std::make_shared<Combat>(1, 1, 5);
-		gobbo->ai = std::make_shared<mobAi>(50);
-		engine.entityList.push_back(gobbo); engine.activeEntities.push_back(gobbo);
-	}
-	else {
-		shared_ptr<Entity> hobbo = std::make_shared<Entity>(x, y, "Hobbo", 'h', TCODColor::darkOrange);
-		hobbo->mortal = std::make_shared<Mortal>(20, "dead hobbo");
-		hobbo->combat = std::make_shared<Combat>(4, 3, 6); 
-		hobbo->ai = std::make_shared<mobAi>(150);
-		engine.entityList.push_back(hobbo); engine.activeEntities.push_back(hobbo);
+	
+	const char * monsterName = "";
+
+	if(roll < 80) {	monsterName = "Gobbo"; }
+	else { monsterName = "Hobbo"; }
+
+	auto it = engine.entityTemplates.find(monsterName); // Try to find a template for monsterName.
+	if(it != engine.entityTemplates.end()) {
+		shared_ptr<Entity> monster = it->second->clone();
+		monster->x = x;
+		monster->y = y;
+		engine.entityList.push_back(monster);
+		engine.activeEntities.push_back(monster);
 	}
 }
 
@@ -201,24 +201,19 @@ void Map::addItem(int x, int y) {
 	std::random_device seed;
 	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
 	int roll = rng->getInt(1, 100);
-	if(roll < 70) {
-		shared_ptr<Entity> healPotion = std::make_shared<Entity>(x, y, "Healing Potion", '!',  TCODColor::crimson);
-		healPotion->blocks = false; healPotion->loot = std::make_shared<Healer>(4);
-		engine.entityList.push_back(healPotion); engine.inactiveEntities.push_back(healPotion);
-	}
-	else if(roll < 70 + 10) {
-		shared_ptr<Entity> lBoltScroll = std::make_shared<Entity>(x, y, "Lightning Bolt Scroll", '#', TCODColor::azure);
-		lBoltScroll->blocks = false; lBoltScroll->loot = std::make_shared<LightningBolt>(5.0f, 20);
-		engine.entityList.push_back(lBoltScroll); engine.inactiveEntities.push_back(lBoltScroll);
-	}
-	else if(roll < 70 + 10 + 10) {
-		shared_ptr<Entity> fBallScroll = std::make_shared<Entity>(x, y, "Fireball Scroll", '#',  TCODColor::flame);
-		fBallScroll->blocks = false; fBallScroll->loot = std::make_shared<Fireball>(8.0f, 12, 3.0f);
-		engine.entityList.push_back(fBallScroll); engine.inactiveEntities.push_back(fBallScroll);
-	}
-	else {
-		//shared_ptr<Ent> ConfusionScroll = std::make_shared<Ent>(x, y, '#', "Confusion Scroll", TCODColor::lightGreen);
-		//ConfusionScroll->blocks = false; ConfusionScroll->loot = std::make_shared<Confuser>(10, 8);
-		//engine.entL.push_back(ConfusionScroll);
+
+	const char * itemName = "";
+
+	if(roll < 70) {	itemName = "Healing Potion"; }
+	else if(roll < 70 + 10) { itemName = "Lightning Bolt Scroll"; }
+	else if(roll < 70 + 10 + 10) { itemName = "Fireball Scroll"; }
+	
+	auto it = engine.itemTemplates.find(itemName); // Try to find a template for itemName.
+	if(it != engine.itemTemplates.end()) {
+		shared_ptr<Entity> item = it->second->clone();
+		item->x = x;
+		item->y = y;
+		engine.entityList.push_back(item);
+		engine.inactiveEntities.push_back(item);
 	}
 }
