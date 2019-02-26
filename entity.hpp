@@ -23,4 +23,6 @@ public:
 	void gainEnergy();
 
 	float getDistance(int cx, int cy) const;
+
+	shared_ptr<Entity> clone() const;
 };

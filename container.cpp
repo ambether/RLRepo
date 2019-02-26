@@ -4,6 +4,13 @@ Container::Container() : size(0) {}
 
 Container::Container(int size) : size(size) {}
 
+Container::Container(const Container & obj) {
+	size = obj.size;
+	for(auto & e : obj.inventory) {
+		inventory.emplace_back(e->clone());
+	}
+}
+
 Container::~Container() { inventory.clear(); }
 
 bool Container::canAdd(shared_ptr<Entity> entity) {

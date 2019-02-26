@@ -16,6 +16,13 @@ Spell::Spell(std::string name, int level, float range, const TCODColor color)
 	radius(0), 
 	color(color) {}
 
+Spell::Spell(const Spell & obj) : color(obj.color) { // Init color here because it's const
+	level = obj.level;
+	range = obj.range;
+	radius = obj.radius;
+	name = obj.name;
+}
+
 int Spell::getLevel() const { return level; }
 
 float Spell::getRange() const { return range; }
@@ -34,6 +41,16 @@ DamageSpell::DamageSpell(std::string name, int level, float range, float radius,
 DamageSpell::DamageSpell(std::string name, int level, float range, int damage, const TCODColor color)
 	: Spell(name, level, range, color), 
 	damage(damage) {}
+
+DamageSpell::DamageSpell(const DamageSpell & obj) : Spell(obj) {
+	damage = obj.damage;
+	tx = obj.tx;
+	ty = obj.ty;
+}
+
+shared_ptr<Spell> DamageSpell::clone() const {
+	return std::make_shared<DamageSpell>(*this);
+}
 
 bool DamageSpell::canUse(shared_ptr<Entity> owner) {
 	if(owner->spellCaster->getCharges(level) > 0) {

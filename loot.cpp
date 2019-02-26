@@ -41,6 +41,12 @@ void Loot::drop(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 
 Healer::Healer(int amt) : amt(amt) {}
 
+Healer::Healer(const Healer & obj) { amt = obj.amt; }
+
+shared_ptr<Loot> Healer::clone() const {
+	return std::make_shared<Healer>(*this);
+}
+
 bool Healer::canUse(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 	if(bearer->mortal) {
 		int amtHealed = bearer->mortal->predictHeal(amt);
@@ -64,10 +70,20 @@ void Healer::use(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 
 DamageSpellItem::DamageSpellItem(float range, int dmg, float radius) : range(range), dmg(dmg), radius(radius) {}
 
+DamageSpellItem::DamageSpellItem(const DamageSpellItem & obj) {
+	range = obj.range;
+	dmg = obj.dmg;
+	radius = obj.radius;
+}
+
 
 // LIGHTNING BOLT
 
 LightningBolt::LightningBolt(float range, int dmg) : DamageSpellItem(range, dmg) {}
+
+shared_ptr<Loot> LightningBolt::clone() const {
+	return std::make_shared<LightningBolt>(*this);
+}
 
 bool LightningBolt::canUse(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 	shared_ptr<Entity> closestMonster = engine.getClosestMonster(bearer->x, bearer->y, range);
@@ -88,6 +104,15 @@ void LightningBolt::use(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 // FIREBALL
 
 Fireball::Fireball(float range, int dmg, float radius) : DamageSpellItem(range, dmg, radius) {}
+
+Fireball::Fireball(const Fireball & obj) : DamageSpellItem(obj.range, obj.dmg, obj.radius) {
+	x = obj.x;
+	y = obj.y;
+}
+
+shared_ptr<Loot> Fireball::clone() const {
+	return std::make_shared<Fireball>(*this);
+}
 
 bool Fireball::canUse(shared_ptr<Entity> owner, shared_ptr<Entity> bearer) {
 	engine.ui->message(TCODColor::cyan, "Left-click to cast fireball,\nor right-click to cancel.");

@@ -4,6 +4,7 @@ class Combat {
 public:
 	Combat();
 	Combat(int dexterity, int skill, int strength);
+	Combat(const Combat & obj); // Copy ctor
 
 	int getDex() const;
 	int getSkl() const;

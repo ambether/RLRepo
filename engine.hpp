@@ -1,11 +1,22 @@
 #pragma once
 
 class Engine {
+private:
+	struct char_cmp {
+		bool operator()(const char * a, const char * b) const {
+			return strcmp(a, b) < 0;
+		}
+	};
 public:
 	enum gameState { START, IDLE, TURN, NEW_TURN, WIN, LOSE } gameState;
 
 	TCOD_key_t lastKey;
 	TCOD_mouse_t mouse;
+	
+	typedef std::map<const char *, shared_ptr<Entity>, char_cmp> EntityMap; // The type for the template maps.
+
+	EntityMap entityTemplates; // A map of Entity templates. These templates will be cloned to make new Entities.
+	EntityMap itemTemplates; // A map of Item templates. These templates will be cloned to make new Items.
 
 	vector<shared_ptr<Entity>> entityList;		// A list of all Entities in the game.
 	vector<shared_ptr<Entity>> activeEntities;	// It is assumed Entities in this list have Ai, Mortal, and are not dead.

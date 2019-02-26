@@ -4,6 +4,7 @@ class Ai {
 public:
 	Ai();
 	Ai(int speed);
+	virtual shared_ptr<Ai> clone() const = 0;
 	virtual void update(shared_ptr<Entity> owner) = 0;
 	void gainEnergy();
 	void setSpeed(int speed);
@@ -16,6 +17,8 @@ protected:
 class playerAi : public Ai {
 public:
 	playerAi();
+	playerAi(const playerAi & obj); // Copy ctor
+	shared_ptr<Ai> clone() const override;
 	void update(shared_ptr<Entity> owner);
 protected:
 	void handleActionKey(shared_ptr<Entity> owner, int ascii);
@@ -29,6 +32,8 @@ class mobAi : public Ai {
 public:
 	mobAi();
 	mobAi(int speed);
+	mobAi(const mobAi & obj); // Copy ctor
+	shared_ptr<Ai> clone() const override;
 	void update(shared_ptr<Entity> owner);
 protected:
 	int moveCount;

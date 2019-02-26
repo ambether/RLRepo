@@ -40,3 +40,24 @@ float Entity::getDistance(int cx, int cy) const {
 	int dy = y - cy;
 	return sqrtf(dx*dx + dy*dy);
 }
+
+shared_ptr<Entity> Entity::clone() const {
+	shared_ptr<Entity> cpy = std::make_shared<Entity>();
+	cpy->x = x;
+	cpy->y = y;
+	cpy->name = _strdup(name);
+	cpy->ch = ch;
+	cpy->color = color;
+	cpy->blocks = blocks;
+
+	// ai, loot, and interaction have to be cloned because they are polymorphic
+	if(combat)		{ cpy->combat = std::make_shared<Combat>(*combat); }
+	if(mortal)		{ cpy->mortal = std::make_shared<Mortal>(*mortal); }
+	if(ai)			{ cpy->ai = ai->clone(); }
+	if(loot)		{ cpy->loot = loot->clone(); }
+	if(container)	{ cpy->container = std::make_shared<Container>(*container); }
+	if(interaction) { cpy->interaction = interaction->clone(); }
+	if(spellCaster) { cpy->spellCaster = std::make_shared<SpellCaster>(*spellCaster); }
+
+	return cpy;
+}

@@ -7,6 +7,7 @@ public:
 
 	Mortal();
 	Mortal(int maxHp, const char * corpseName);
+	Mortal(const Mortal & obj); // Copy ctor
 
 	inline bool isDead() { return hp <= 0; }
 

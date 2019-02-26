@@ -15,6 +15,15 @@ void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
 
 playerAi::playerAi() : Ai(100) {}
 
+playerAi::playerAi(const playerAi & obj) {
+	speed = obj.speed;
+	energy = obj.energy;
+}
+
+shared_ptr<Ai> playerAi::clone() const {
+	return std::make_shared<playerAi>(*this);
+}
+
 void playerAi::update(shared_ptr<Entity> owner) {
 	if(owner->mortal && !owner->mortal->isDead()) {
 		if(energy >= 100) {
@@ -202,6 +211,16 @@ static const int TRACK_TURNS(3);
 mobAi::mobAi() : Ai() {}
 
 mobAi::mobAi(int speed) : Ai(speed) {}
+
+mobAi::mobAi(const mobAi & obj) {
+	speed = obj.speed;
+	energy = obj.energy;
+	moveCount = obj.moveCount;
+}
+
+shared_ptr<Ai> mobAi::clone() const {
+	return std::make_shared<mobAi>(*this);
+}
 
 void mobAi::update(shared_ptr<Entity> owner) {
 	if(owner->mortal && owner->mortal->isDead()) { return; }

@@ -7,6 +7,7 @@ public:
 
 	Container();
 	Container(int size);
+	Container(const Container & obj); // Clone ctor
 	~Container();
 
 	bool canAdd(shared_ptr<Entity> entity);

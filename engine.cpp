@@ -19,10 +19,20 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	DataFile * df = new DataFile();
 	df->parseEntities();
 	df->parseItems();
+
+	for(auto & ent : df->entList) {
+		entityTemplates.insert(EntityMap::value_type(_strdup(ent->name), ent->clone()));
+	}
+	for(auto & it : df->itemList) {
+		itemTemplates.insert(EntityMap::value_type(_strdup(it->name), it->clone()));
+	}
+
 	delete df;
 }
 
 Engine::~Engine() {
+	entityTemplates.clear();
+	itemTemplates.clear();
 	entityList.clear();
 	activeEntities.clear();
 	inactiveEntities.clear();

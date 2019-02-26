@@ -6,6 +6,12 @@ Combat::Combat() : dexterity(0), skill(0), strength(0) {}
 
 Combat::Combat(int dexterity, int skill, int strength) : dexterity(dexterity), skill(skill), strength(strength) {}
 
+Combat::Combat(const Combat & obj) {
+	dexterity = obj.dexterity;
+	skill = obj.skill;
+	strength = obj.strength;
+}
+
 int Combat::getDex() const { return dexterity; }
 
 int Combat::getSkl() const { return skill; }

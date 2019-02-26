@@ -9,9 +9,10 @@ public:
 	void parseItems();
 
 	shared_ptr<TCODParser> parser;
-private:
+
 	vector<shared_ptr<Entity>> entList;
 	vector<shared_ptr<Entity>> itemList; // Entities with the Loot component
+private:
 	
 	class EntityParserListener;
 	class ItemParserListener;

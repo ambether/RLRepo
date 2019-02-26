@@ -4,6 +4,12 @@ Mortal::Mortal() {}
 
 Mortal::Mortal(int maxHp, const char * corpseName) : maxHp(maxHp), hp(maxHp), corpseName(corpseName) {}
 
+Mortal::Mortal(const Mortal & obj) {
+	maxHp = obj.maxHp;
+	hp = obj.hp;
+	corpseName = _strdup(obj.corpseName);
+}
+
 int Mortal::takeDamage(shared_ptr<Entity> owner, int dmg) {
 	if(dmg > 0) {
 		hp -= dmg;
