@@ -1,0 +1,32 @@
+Spell "Magic Missle" {
+	level=1
+	range=10.0
+	col="233,166,255" // lighter purple
+	target="RANGED"
+	DamageSpell { damage=5 }
+}
+
+Spell "Minor Heal" {
+	level=1
+	range=0.0
+	col="255,255,115" // light yellow
+	target="SELF"
+	HealSpell { heal=8 }
+}
+
+Spell "Fireball" {
+	level=2
+	range=5.0
+	radius=2.0
+	col="255,63,0" // flame
+	target="RANGED"
+	DamageSpell { damage=8 }
+}
+
+Spell "Lightning Bolt" {
+	level=3
+	range=15
+	col="0,255,255" // cyan
+	target="CLOSEST"
+	DamageSpell { damage=15 }
+}

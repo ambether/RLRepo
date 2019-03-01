@@ -95,7 +95,7 @@ Action::ActionResult InteractAction::execute() {
 CastAction::CastAction(shared_ptr<Spell> spell, shared_ptr<Entity> caster) : spell(spell), caster(caster) {}
 
 Action::ActionResult CastAction::execute() {
-	engine.ui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->getName().c_str());
+	engine.ui->message(TCODColor::lightPurple, "%s casts %s.", caster->name, spell->name);
 	spell->use(caster);
 	return ActionResult();
 }

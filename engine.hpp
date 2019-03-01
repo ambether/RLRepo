@@ -14,9 +14,11 @@ public:
 	TCOD_mouse_t mouse;
 	
 	typedef std::map<const char *, shared_ptr<Entity>, char_cmp> EntityMap; // The type for the template maps.
+	typedef std::map<const char *, shared_ptr<Spell>, char_cmp> SpellMap; // The type for the Spell template map.
 
 	EntityMap entityTemplates; // A map of Entity templates. These templates will be cloned to make new Entities.
 	EntityMap itemTemplates; // A map of Item templates. These templates will be cloned to make new Items.
+	SpellMap spellTemplates; // A map of Spell templates. These templates will be cloned to make new Spells.
 
 	vector<shared_ptr<Entity>> entityList;		// A list of all Entities in the game.
 	vector<shared_ptr<Entity>> activeEntities;	// It is assumed Entities in this list have Ai, Mortal, and are not dead.

@@ -176,9 +176,9 @@ shared_ptr<Spell> playerAi::chooseFromSpells(shared_ptr<Entity> owner) {
 	int i = 1;
 
 	for(auto & spell : owner->spellCaster->spellList) {
-		if(owner->spellCaster->getCharges(spell->getLevel()) == 0) con.setDefaultForeground(TCODColor::darkGrey);
+		if(owner->spellCaster->getCharges(spell->level) == 0) con.setDefaultForeground(TCODColor::darkGrey);
 		else con.setDefaultForeground(TCODColor::white);
-		con.print(2, i, "(%c) %s (level %d)", is, spell->getName().c_str(), spell->getLevel());
+		con.print(2, i, "(%c) %s (level %d)", is, spell->name, spell->level);
 		++i; ++is;
 	}
 

@@ -16,7 +16,7 @@ SpellCaster::SpellCaster(const SpellCaster & obj) {
 		charges[i] = obj.charges[i];
 	}
 	for(auto & spell : obj.spellList) {
-		spellList.push_back(spell->clone());
+		spellList.push_back(std::make_shared<Spell>(*spell));
 	}
 }
 

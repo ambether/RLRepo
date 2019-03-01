@@ -5,6 +5,7 @@
 DataFile::DataFile() {
 	entList = vector<shared_ptr<Entity>>();
 	itemList = vector<shared_ptr<Entity>>();
+	spellList = vector<shared_ptr<Spell>>();
 }
 
 void DataFile::parseEntities() {
@@ -68,6 +69,30 @@ void DataFile::parseItems() {
 	catch(std::exception & e) { fprintf(stderr, e.what()); }
 }
 
+void DataFile::parseSpells() {
+	parser = std::make_shared<TCODParser>();
+
+	TCODParserStruct * spellTypeStruct = parser->newStructure("Spell"); // Init Spell structure
+	spellTypeStruct->addProperty("level", TCOD_TYPE_INT, true);
+	spellTypeStruct->addProperty("range", TCOD_TYPE_FLOAT, true);
+	spellTypeStruct->addProperty("radius", TCOD_TYPE_FLOAT, false);
+	spellTypeStruct->addProperty("col", TCOD_TYPE_COLOR, true);
+	spellTypeStruct->addProperty("target", TCOD_TYPE_STRING, true);
+
+	TCODParserStruct * damageSpellTypeStruct = parser->newStructure("DamageSpell"); // Init DamageSpell structure
+	damageSpellTypeStruct->addProperty("damage", TCOD_TYPE_INT, true);
+	spellTypeStruct->addStructure(damageSpellTypeStruct); // Add DamageSpell as a substructure to Spell
+
+	TCODParserStruct * healSpellTypeStruct = parser->newStructure("HealSpell"); // Init HealSpell structure
+	healSpellTypeStruct->addProperty("heal", TCOD_TYPE_INT, true);
+	spellTypeStruct->addStructure(healSpellTypeStruct); // Add HealSpell as a substructure to Spell
+
+	try {
+		parser->run("spelldata.txt", new SpellParserListener(&spellList));
+	}
+	catch(std::exception & e) { fprintf(stderr, e.what()); }
+}
+
 
 // EntityParserListener
 
@@ -78,7 +103,7 @@ bool DataFile::EntityParserListener::parserNewStruct(TCODParser * parser, const 
 	if(strcmp(strctName, "Entity") == 0) {
 		currentEntity = std::make_shared<Entity>();
 		currentEntity->name = _strdup(name);
-		entList->emplace_back(currentEntity);
+		entList->push_back(currentEntity);
 	}
 	else if(strcmp(strctName, "Ai") == 0) {
 		if(strcmp(name, "playerAi") == 0)	{ currentEntity->ai = std::make_shared<playerAi>(); }
@@ -147,8 +172,8 @@ void DataFile::EntityParserListener::error(const char * msg) {
 DataFile::ItemParserListener::ItemParserListener(vector<shared_ptr<Entity>> * itemList) : itemList(itemList) {}
 
 DataFile::ItemParserListener::~ItemParserListener() {
-	delete damageSpellData;
-	delete healerData;
+	if(damageSpellData)	delete damageSpellData;
+	if(healerData) delete healerData;
 }
 
 bool DataFile::ItemParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
@@ -157,7 +182,7 @@ bool DataFile::ItemParserListener::parserNewStruct(TCODParser * parser, const TC
 		currentItem = std::make_shared<Entity>();
 		currentItem->name = _strdup(name);
 		currentItem->blocks = false;
-		itemList->emplace_back(currentItem);
+		itemList->push_back(currentItem);
 	}
 	else if(strcmp(strctName, "Healer") == 0) {
 		healerData = new _HealerData();
@@ -206,3 +231,68 @@ void DataFile::ItemParserListener::error(const char * msg) {
 	fprintf(stderr, "In ItemParserListener:\n");
 	throw(std::exception(msg));
 }
+
+
+// SpellParserListener
+
+DataFile::SpellParserListener::SpellParserListener(vector<shared_ptr<Spell>> * spellList) : spellList(spellList) {}
+
+bool DataFile::SpellParserListener::parserNewStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+	const char * strctName = strct->getName();
+	if(strcmp(strctName, "Spell") == 0) {
+		currentSpell = std::make_shared<Spell>();
+		currentSpell->name = _strdup(_strdup(name));
+		spellList->push_back(currentSpell);
+	}
+	else if(strcmp(strctName, "DamageSpell") == 0) {
+		currentSpell->initDamageDealer();
+	}
+	else if(strcmp(strctName, "HealSpell") == 0) {
+		currentSpell->initHealer();
+	}
+	return true;
+}
+
+bool DataFile::SpellParserListener::parserFlag(TCODParser * parser, const char * name) {
+
+	return true;
+}
+
+bool DataFile::SpellParserListener::parserProperty(TCODParser * parser, const char * name, TCOD_value_type_t type, TCOD_value_t value) {
+	if(strcmp(name, "level") == 0) {
+		currentSpell->level = value.i;
+	}
+	else if(strcmp(name, "range") == 0) {
+		currentSpell->range = value.f;
+	}
+	else if(strcmp(name, "radius") == 0) {
+		currentSpell->radius = value.f;
+	}
+	else if(strcmp(name, "col") == 0) {
+		currentSpell->color = value.col;
+	}
+	else if(strcmp(name, "target") == 0) {
+		if(strcmp(value.s, "SELF") == 0) {
+			currentSpell->targetType = Spell::TargetType::SELF;
+		}
+		else if(strcmp(value.s, "CLOSEST") == 0) {
+			currentSpell->targetType = Spell::TargetType::CLOSEST;
+		}
+		else if(strcmp(value.s, "RANGED") == 0) {
+			currentSpell->targetType = Spell::TargetType::RANGED;
+		}
+	}
+	else if(strcmp(name, "damage") == 0) {
+		currentSpell->addDamage(value.i);
+	}
+	else if(strcmp(name, "heal") == 0) {
+		currentSpell->addHeal(value.i);
+	}
+	return true;
+}
+
+bool DataFile::SpellParserListener::parserEndStruct(TCODParser * parser, const TCODParserStruct * strct, const char * name) {
+	return true;
+}
+
+void DataFile::SpellParserListener::error(const char * msg) {}
