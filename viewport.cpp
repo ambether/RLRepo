@@ -14,13 +14,13 @@ Viewport::~Viewport() { delete mapConsole; }
 
 void Viewport::render() const { TCODConsole::blit(mapConsole, viewportX, viewportY, width, height, TCODConsole::root, 0, 0); }
 
-void Viewport::renderMap(std::shared_ptr<Map> map) { map->render(mapConsole); }
+void Viewport::renderMap(shared_ptr<Map> map) { map->render(mapConsole); }
 
-void Viewport::renderEntity(std::shared_ptr<Entity> entity) { entity->render(mapConsole); }
+void Viewport::renderEntity(shared_ptr<Entity> entity) { entity->render(mapConsole); }
 
 void Viewport::clear() { mapConsole->clear(); }
 
-void Viewport::moveView(std::shared_ptr<Entity> & centeredOn) { calculateView(centeredOn); }
+void Viewport::moveView(shared_ptr<Entity> & centeredOn) { calculateView(centeredOn); }
 
 int Viewport::getOffsetX() const { return viewportX; }
 
@@ -34,7 +34,7 @@ TCODColor Viewport::getCharBackground(int x, int y) const { return mapConsole->g
 
 void Viewport::setCharBackground(int x, int y, const TCODColor & col) { mapConsole->setCharBackground(x, y, col); }
 
-void Viewport::calculateView(std::shared_ptr<Entity> & centeredOn) {
+void Viewport::calculateView(shared_ptr<Entity> & centeredOn) {
 	int tx = centeredOn->x,
 		ty = centeredOn->y;
 	viewportX = tx - halfViewWidth;

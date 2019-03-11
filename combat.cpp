@@ -2,7 +2,15 @@
 
 //Combat::Combat(float atk) : atk(atk) {}
 
+Combat::Combat() : dexterity(0), skill(0), strength(0) {}
+
 Combat::Combat(int dexterity, int skill, int strength) : dexterity(dexterity), skill(skill), strength(strength) {}
+
+Combat::Combat(const Combat & obj) {
+	dexterity = obj.dexterity;
+	skill = obj.skill;
+	strength = obj.strength;
+}
 
 int Combat::getDex() const { return dexterity; }
 
@@ -10,10 +18,16 @@ int Combat::getSkl() const { return skill; }
 
 int Combat::getStr() const { return strength; }
 
-void Combat::attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target) {
+void Combat::setDex(int dex) { dexterity = dex; }
+
+void Combat::setSkl(int skl) { skill = skl; }
+
+void Combat::setStr(int str) { strength = str; }
+
+void Combat::attack(shared_ptr<Entity> attacker, shared_ptr<Entity> target) {
 	// Attackers start with a 40% chance to hit. The chance goes up by 5% for each point of SKL they have.
 	std::random_device seed;
-	std::shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed()); // Initialize a prng with a (psuedo)random seed.
+	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed()); // Initialize a prng with a (psuedo)random seed.
 	int toHitRoll = rng->getInt(1, 100);
 	if(toHitRoll + (skill * SKL_MOD) >= (100 - BASE_HIT_CHANCE)) {
 		// The attacker has hit so roll for the target's dodge

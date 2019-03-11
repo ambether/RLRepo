@@ -1,23 +1,46 @@
 #include "main.hpp"
 
 Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH), computeFov(true), gameState(START) {
+	// Init the root console
 	TCODConsole::initRoot(sW, sH, "memes to dreams", false);
-	player = std::make_shared<Entity>(1, 1, "Player", '@', TCODColor::white);
-	player->mortal = std::make_shared<pcMortal>(30, "your lifeless corpse");
-	player->combat = std::make_shared<Combat>(1, 3, 10);
-	player->ai = std::make_shared<playerAi>();
-	player->container = std::make_shared<Container>(10);
-	player->spellCaster = std::make_shared<SpellCaster>();
-	player->spellCaster->spellList.push_back(std::make_shared<DamageSpell>("Magic Missle", 1, 10.0f, 5, TCODColor::lighterPurple));
-	player->spellCaster->spellList.push_back(std::make_shared<DamageSpell>("Fireball", 2, 5.0f, 2.0f, 8, TCODColor::flame));
-	entityList.push_back(player); activeEntities.push_back(player);
+	
+	// Read from the data files
+	DataFile * df = new DataFile();
 
+	// Parse and store Spells
+	df->parseSpells();
+	for(auto & sp : df->spellList) {
+		spellTemplates.insert(SpellMap::value_type(_strdup(sp->name), std::make_shared<Spell>(*sp)));
+	}
+
+	// Parse and store Items
+	df->parseItems();
+	for(auto & it : df->itemList) {
+		itemTemplates.insert(EntityMap::value_type(_strdup(it->name), it->clone()));
+	}
+
+	// Parse and store Entities
+	df->parseEntities();
+	for(auto & ent : df->entList) {
+		entityTemplates.insert(EntityMap::value_type(_strdup(ent->name), ent->clone()));
+	}
+
+	delete df;
+	
+	// Initialize the Player
+	player = entityTemplates["Player"]->clone();
+	entityList.push_back(player); activeEntities.push_back(player);
+	
+	// Make the dungeon
 	dungeon = std::make_shared<Map>(130, 80);
+	// Init the ui
 	ui = std::make_shared<Ui>();
 	ui->message(TCODColor::red, "Whalecum nerd.");
 }
 
 Engine::~Engine() {
+	entityTemplates.clear();
+	itemTemplates.clear();
 	entityList.clear();
 	activeEntities.clear();
 	inactiveEntities.clear();
@@ -25,8 +48,8 @@ Engine::~Engine() {
 	deaths.clear();
 }
 
-std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
-	std::shared_ptr<Entity> closest = NULL;
+shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) const {
+	shared_ptr<Entity> closest = NULL;
 	float bestDist = 1E6f;
 	for(auto & ent : activeEntities) {
 		if(ent != player) {
@@ -40,7 +63,7 @@ std::shared_ptr<Entity> Engine::getClosestMonster(int x, int y, float range) con
 	return closest;
 }
 
-std::shared_ptr<Entity> Engine::getMonster(int x, int y) const {
+shared_ptr<Entity> Engine::getMonster(int x, int y) const {
 	for(auto & ent : activeEntities) {
 		if(ent->x == x && ent->y == y) { return ent; }
 	}
@@ -116,9 +139,9 @@ void Engine::render() {
 	ui->render();
 }
 
-void Engine::notifyDeath(std::shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
+void Engine::notifyDeath(shared_ptr<Entity> entity) { deaths.emplace_back(entity); }
 
-void Engine::addAction(std::shared_ptr<Action> action) { actionQueue.addAction(action); }
+void Engine::addAction(shared_ptr<Action> action) { actionQueue.addAction(action); }
 
 void Engine::setComputeFov(bool value) { computeFov = value; }
 

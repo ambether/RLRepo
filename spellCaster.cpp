@@ -7,6 +7,19 @@ SpellCaster::SpellCaster()
 	charges = new int[3] {maxCharges1, maxCharges2, maxCharges3};
 }
 
+SpellCaster::SpellCaster(const SpellCaster & obj) {
+	maxCharges1 = obj.maxCharges1;
+	maxCharges2 = obj.maxCharges2;
+	maxCharges3 = obj.maxCharges3;
+	charges = new int[sizeof(obj.charges)];
+	for(int i = 0; i < sizeof(charges); ++i) {
+		charges[i] = obj.charges[i];
+	}
+	for(auto & spell : obj.spellList) {
+		spellList.push_back(std::make_shared<Spell>(*spell));
+	}
+}
+
 SpellCaster::~SpellCaster() { spellList.clear(); delete [] charges; }
 
 int SpellCaster::getCharges(int level) const {

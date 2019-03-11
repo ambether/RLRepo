@@ -7,19 +7,22 @@ public:
 	const char * name;
 	bool blocks;
 
-	std::shared_ptr<Combat> combat;
-	std::shared_ptr<Mortal> mortal;
-	std::shared_ptr<Ai> ai;
-	std::shared_ptr<Loot> loot;
-	std::shared_ptr<Container> container;
-	std::shared_ptr<Interaction> interaction;
-	std::shared_ptr<SpellCaster> spellCaster;
+	shared_ptr<Combat> combat;
+	shared_ptr<Mortal> mortal;
+	shared_ptr<Ai> ai;
+	shared_ptr<Loot> loot;
+	shared_ptr<Container> container;
+	shared_ptr<Interaction> interaction;
+	shared_ptr<SpellCaster> spellCaster;
 
+	Entity();
 	Entity(int x, int y, const char * name, int ch, const TCODColor & col);
 
 	void render(TCODConsole * renderConsole) const;
-	void update(std::shared_ptr<Entity> owner);
+	void update(shared_ptr<Entity> owner);
 	void gainEnergy();
 
 	float getDistance(int cx, int cy) const;
+
+	shared_ptr<Entity> clone() const;
 };

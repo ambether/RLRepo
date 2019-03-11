@@ -1,0 +1,24 @@
+Item "Healing Potion" {
+	symbol='!'
+	col="255,0,63" // crimson
+	Healer { amt=4 }
+}
+
+Item "Lightning Bolt Scroll" {
+	symbol='#'
+	col="0,127,255" // azure
+	DamageSpell {
+		range=5.0
+		dmg=20
+	}
+}
+
+Item "Fireball Scroll" {
+	symbol='#'
+	col="255,63,0" // flame
+	DamageSpell {
+		range=8.0
+		dmg=12
+		radius=3.0
+	}
+}

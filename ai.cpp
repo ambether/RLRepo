@@ -1,15 +1,30 @@
 #include "main.hpp"
 
+Ai::Ai() : speed(0), energy(0) {}
+
 Ai::Ai(int speed) : speed(speed), energy(0) {}
 
 void Ai::gainEnergy() { energy += speed; }
+
+void Ai::setSpeed(int speed) { this->speed = speed; }
+
+int Ai::getSpeed() const { return speed; }
 
 void Ai::spendEnergy() { if(energy >= 100) energy -= 100; }
 
 
 playerAi::playerAi() : Ai(100) {}
 
-void playerAi::update(std::shared_ptr<Entity> owner) {
+playerAi::playerAi(const playerAi & obj) {
+	speed = obj.speed;
+	energy = obj.energy;
+}
+
+shared_ptr<Ai> playerAi::clone() const {
+	return std::make_shared<playerAi>(*this);
+}
+
+void playerAi::update(shared_ptr<Entity> owner) {
 	if(owner->mortal && !owner->mortal->isDead()) {
 		if(energy >= 100) {
 			int dx = 0, dy = 0;
@@ -34,7 +49,7 @@ void playerAi::update(std::shared_ptr<Entity> owner) {
 	}
 }
 
-void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
+void playerAi::handleActionKey(shared_ptr<Entity> owner, int ascii) {
 	switch(ascii) {
 	case 'g': // Grab item
 		{
@@ -59,7 +74,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 		break;
 	case 'i': // Access inventory
 		{
-			std::shared_ptr<Entity> item = chooseFromInv(owner);
+			shared_ptr<Entity> item = chooseFromInv(owner);
 			if(item != nullptr && item->loot->canUse(item, owner)) { 
 				spendEnergy();
 				engine.addAction(std::make_shared<UseAction>(item, owner));
@@ -103,7 +118,7 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 		break;
 	case 'f': // Fire spell
 		{
-			std::shared_ptr<Spell> spell = chooseFromSpells(owner);
+			shared_ptr<Spell> spell = chooseFromSpells(owner);
 			if(spell != nullptr && spell->canUse(owner)) {
 				spendEnergy();
 				engine.addAction(std::make_shared<CastAction>(spell, owner));
@@ -113,14 +128,14 @@ void playerAi::handleActionKey(std::shared_ptr<Entity> owner, int ascii) {
 	}
 }
 
-bool playerAi::moveOrAttack(std::shared_ptr<Entity> owner, int dx, int dy) {
+bool playerAi::moveOrAttack(shared_ptr<Entity> owner, int dx, int dy) {
 	if(engine.dungeon->isWall(owner->x + dx, owner->y + dy)) { return false; }
 	spendEnergy();
 	engine.addAction(std::make_shared<MoveAction>(owner, dx, dy));
 	return true;
 }
 
-std::shared_ptr<Entity> playerAi::chooseFromInv(std::shared_ptr<Entity> owner) {
+shared_ptr<Entity> playerAi::chooseFromInv(shared_ptr<Entity> owner) {
 	static const int invW = 50, invH = 28;
 	static TCODConsole con(invW, invH);
 
@@ -150,7 +165,7 @@ std::shared_ptr<Entity> playerAi::chooseFromInv(std::shared_ptr<Entity> owner) {
 	return nullptr;
 }
 
-std::shared_ptr<Spell> playerAi::chooseFromSpells(std::shared_ptr<Entity> owner) {
+shared_ptr<Spell> playerAi::chooseFromSpells(shared_ptr<Entity> owner) {
 	static const int frameW = 50, frameH = 28;
 	static TCODConsole con(frameW, frameH);
 
@@ -161,9 +176,9 @@ std::shared_ptr<Spell> playerAi::chooseFromSpells(std::shared_ptr<Entity> owner)
 	int i = 1;
 
 	for(auto & spell : owner->spellCaster->spellList) {
-		if(owner->spellCaster->getCharges(spell->getLevel()) == 0) con.setDefaultForeground(TCODColor::darkGrey);
+		if(owner->spellCaster->getCharges(spell->level) == 0) con.setDefaultForeground(TCODColor::darkGrey);
 		else con.setDefaultForeground(TCODColor::white);
-		con.print(2, i, "(%c) %s (level %d)", is, spell->getName().c_str(), spell->getLevel());
+		con.print(2, i, "(%c) %s (level %d)", is, spell->name, spell->level);
 		++i; ++is;
 	}
 
@@ -193,9 +208,21 @@ TCOD_key_t playerAi::chooseInteractDirection() const {
 
 static const int TRACK_TURNS(3);
 
+mobAi::mobAi() : Ai() {}
+
 mobAi::mobAi(int speed) : Ai(speed) {}
 
-void mobAi::update(std::shared_ptr<Entity> owner) {
+mobAi::mobAi(const mobAi & obj) {
+	speed = obj.speed;
+	energy = obj.energy;
+	moveCount = obj.moveCount;
+}
+
+shared_ptr<Ai> mobAi::clone() const {
+	return std::make_shared<mobAi>(*this);
+}
+
+void mobAi::update(shared_ptr<Entity> owner) {
 	if(owner->mortal && owner->mortal->isDead()) { return; }
 
 	while(energy >= 100) {
@@ -207,12 +234,12 @@ void mobAi::update(std::shared_ptr<Entity> owner) {
 	}
 }
 
-void mobAi::moveOrAttack(std::shared_ptr<Entity> owner) {
+void mobAi::moveOrAttack(shared_ptr<Entity> owner) {
 	spendEnergy();
 	engine.addAction(std::make_shared<MoveAtPlayerAction>(owner));
 }
 
-void mobAi::idle(std::shared_ptr<Entity> owner) {
+void mobAi::idle(shared_ptr<Entity> owner) {
 	spendEnergy();
 	engine.addAction(std::make_shared<IdleAction>(owner));
 }

@@ -3,13 +3,15 @@
 class Container {
 public:
 	int size; // Max container size
-	std::vector<std::shared_ptr<Entity>> inventory;
+	vector<shared_ptr<Entity>> inventory;
 
+	Container();
 	Container(int size);
+	Container(const Container & obj); // Clone ctor
 	~Container();
 
-	bool canAdd(std::shared_ptr<Entity> entity);
-	bool add(std::shared_ptr<Entity> entity);
+	bool canAdd(shared_ptr<Entity> entity);
+	bool add(shared_ptr<Entity> entity);
 	
-	void del(std::shared_ptr<Entity> entity);
+	void del(shared_ptr<Entity> entity);
 };

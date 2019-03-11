@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 #include <queue>
 #include <random>
 #include <functional>
@@ -9,6 +10,9 @@
 #include <utility>
 
 #include "libtcod.hpp"
+
+using std::shared_ptr;
+using std::vector;
 
 class Entity;
 
@@ -32,5 +36,7 @@ class Entity;
 #include "log.hpp"
 #include "statScreen.hpp"
 #include "ui.hpp"
+
+#include "dataFile.hpp"
 
 #include "engine.hpp"

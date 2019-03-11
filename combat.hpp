@@ -2,13 +2,19 @@
 
 class Combat {
 public:
+	Combat();
 	Combat(int dexterity, int skill, int strength);
+	Combat(const Combat & obj); // Copy ctor
 
 	int getDex() const;
 	int getSkl() const;
 	int getStr() const;
 
-	void attack(std::shared_ptr<Entity> attacker, std::shared_ptr<Entity> target);
+	void setDex(int dex);
+	void setSkl(int skl);
+	void setStr(int str);
+
+	void attack(shared_ptr<Entity> attacker, shared_ptr<Entity> target);
 private:
 	int dexterity,	// DEX
 		skill,		// SKL

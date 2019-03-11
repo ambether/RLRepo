@@ -1,0 +1,58 @@
+Entity "Player" {
+	symbol='@'
+	col="255,255,255" // white
+	blocks=true
+	Mortal "player" {
+		hp=30
+		corpseName="your lifeless corpse"
+	}
+	Combat {
+		dex=1
+		skl=3
+		str=10
+	}
+	Ai "playerAi" {}
+	Container { size=10 }
+	SpellCaster {
+		spellList=["Magic Missle","Minor Heal","Fireball","Lightning Bolt"]
+	}
+}
+
+Entity "Gobbo" {
+	symbol='g'
+	col="64,128,64" // desaturated green
+	blocks=true
+	Mortal "npc" {
+		hp=15
+		corpseName="dead Gobbo"
+	}
+	Combat {
+		dex=1
+		skl=1
+		str=5
+	}
+	Ai "mobAi" { speed=50 }
+}
+
+Entity "Hobbo" {
+	symbol='h'
+	col="191,95,0" // dark orange
+	blocks=true
+	Mortal "npc" {
+		hp=20
+		corpseName="dead Hobbo"
+	}
+	Combat {
+		dex=4
+		skl=3
+		str=6
+	}
+	Ai "mobAi" { speed=150 }
+}
+
+Entity "Door" {
+	symbol='+'
+	col="#BF2B00"
+	blocks=true
+	Interaction "doorInteraction" {}
+}

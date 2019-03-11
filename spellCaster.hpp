@@ -2,9 +2,10 @@
 
 class SpellCaster {
 public:
-	std::vector<std::shared_ptr<Spell>> spellList;
+	vector<shared_ptr<Spell>> spellList;
 
 	SpellCaster();
+	SpellCaster(const SpellCaster & obj); // Copy ctor
 	~SpellCaster();
 
 	int getCharges(int level) const;
