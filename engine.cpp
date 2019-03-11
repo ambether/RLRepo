@@ -6,36 +6,36 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	
 	// Read from the data files
 	DataFile * df = new DataFile();
-	df->parseEntities();
-	df->parseItems();
-	df->parseSpells();
 
-	// Insert the data into the template maps
-	for(auto & ent : df->entList) {
-		entityTemplates.insert(EntityMap::value_type(_strdup(ent->name), ent->clone()));
-	}
-	for(auto & it : df->itemList) {
-		itemTemplates.insert(EntityMap::value_type(_strdup(it->name), it->clone()));
-	}
+	// Parse and store Spells
+	df->parseSpells();
 	for(auto & sp : df->spellList) {
 		spellTemplates.insert(SpellMap::value_type(_strdup(sp->name), std::make_shared<Spell>(*sp)));
 	}
+
+	// Parse and store Items
+	df->parseItems();
+	for(auto & it : df->itemList) {
+		itemTemplates.insert(EntityMap::value_type(_strdup(it->name), it->clone()));
+	}
+
+	// Parse and store Entities
+	df->parseEntities();
+	for(auto & ent : df->entList) {
+		entityTemplates.insert(EntityMap::value_type(_strdup(ent->name), ent->clone()));
+	}
+
 	delete df;
 	
 	// Initialize the Player
 	player = entityTemplates["Player"]->clone();
 	entityList.push_back(player); activeEntities.push_back(player);
 	
-	for(auto & pairs : spellTemplates) { // Add spells to Player
-		player->spellCaster->spellList.push_back(std::make_shared<Spell>(*pairs.second));
-	}
-
 	// Make the dungeon
 	dungeon = std::make_shared<Map>(130, 80);
 	// Init the ui
 	ui = std::make_shared<Ui>();
 	ui->message(TCODColor::red, "Whalecum nerd.");
-	
 }
 
 Engine::~Engine() {

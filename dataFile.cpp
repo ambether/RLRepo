@@ -39,6 +39,7 @@ void DataFile::parseEntities() {
 	entityTypeStruct->addStructure(interactionTypeStruct); // Add Interaction as a substructure to Entity
 
 	TCODParserStruct * spellCasterTypeStruct = parser->newStructure("SpellCaster"); // Init SpellCaster structure
+	spellCasterTypeStruct->addListProperty("spellList", TCOD_TYPE_STRING, false);
 	entityTypeStruct->addStructure(spellCasterTypeStruct); // Add SpellCaster as a substructure to Entity
 
 	try {
@@ -154,8 +155,29 @@ bool DataFile::EntityParserListener::parserProperty(TCODParser * parser, const c
 		} 
 	}
 	else if(strcmp(name, "corpseName") == 0) { if(currentEntity->mortal) currentEntity->mortal->corpseName = _strdup(value.s); }
-	else if(strcmp(name, "size") == 0) { if(currentEntity->container) currentEntity->container->size = value.i; }
 	
+	// Container property
+	else if(strcmp(name, "size") == 0) { if(currentEntity->container) currentEntity->container->size = value.i; }
+
+	// SpellCaster property
+	else if(strcmp(name, "spellList") == 0) {
+		for(int i = 0; i < TCOD_list_size(value.list); ++i) {
+			const char * spellName = (const char *)TCOD_list_get(value.list, i); // Get the name of the Spell
+			if(engine.spellTemplates.find(spellName) != engine.spellTemplates.end()) { // Check if Spell exists
+				currentEntity->spellCaster->spellList.push_back(
+					std::make_shared<Spell>(*engine.spellTemplates[spellName])
+				);
+			}
+			else {
+				const char * errMsg = " is not a valid Spell name.\n";
+				char buf[100];
+				strcpy_s(buf, spellName);
+				strcat_s(buf, errMsg);
+				error(buf);
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -295,4 +317,7 @@ bool DataFile::SpellParserListener::parserEndStruct(TCODParser * parser, const T
 	return true;
 }
 
-void DataFile::SpellParserListener::error(const char * msg) {}
+void DataFile::SpellParserListener::error(const char * msg) {
+	fprintf(stderr, "In SpellParserListener:\n");
+	throw(std::exception(msg));
+}

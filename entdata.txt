@@ -13,7 +13,9 @@ Entity "Player" {
 	}
 	Ai "playerAi" {}
 	Container { size=10 }
-	SpellCaster {} // Eventually will have properties
+	SpellCaster {
+		spellList=["Magic Missle","Minor Heal","Fireball","Lightning Bolt"]
+	}
 }
 
 Entity "Gobbo" {
