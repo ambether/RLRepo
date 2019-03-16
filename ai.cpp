@@ -37,6 +37,10 @@ void playerAi::update(shared_ptr<Entity> owner) {
 			case TCODK_KP4:		dx = -1; break;
 			case TCODK_RIGHT:	dx =  1; break;
 			case TCODK_KP6:		dx =  1; break;
+			case TCODK_KP7:		dx = -1; dy = -1; break;
+			case TCODK_KP9:		dx =  1; dy = -1; break;
+			case TCODK_KP1:		dx = -1; dy =  1; break;
+			case TCODK_KP3:		dx =  1; dy =  1; break;
 			case TCODK_KP5:		handleActionKey(owner, '.'); break;
 			case TCODK_CHAR:	handleActionKey(owner, engine.lastKey.c); break;
 			default: break;
