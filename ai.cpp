@@ -28,21 +28,19 @@ void playerAi::update(shared_ptr<Entity> owner) {
 	if(owner->mortal && !owner->mortal->isDead()) {
 		if(energy >= 100) {
 			int dx = 0, dy = 0;
-			switch(engine.lastKey.vk) {
-			case TCODK_UP:		dy = -1; break;
-			case TCODK_KP8:		dy = -1; break;
-			case TCODK_DOWN:	dy =  1; break;
-			case TCODK_KP2:		dy =  1; break;
-			case TCODK_LEFT:	dx = -1; break;
-			case TCODK_KP4:		dx = -1; break;
-			case TCODK_RIGHT:	dx =  1; break;
-			case TCODK_KP6:		dx =  1; break;
-			case TCODK_KP7:		dx = -1; dy = -1; break;
-			case TCODK_KP9:		dx =  1; dy = -1; break;
-			case TCODK_KP1:		dx = -1; dy =  1; break;
-			case TCODK_KP3:		dx =  1; dy =  1; break;
-			case TCODK_KP5:		handleActionKey(owner, '.'); break;
-			case TCODK_CHAR:	handleActionKey(owner, engine.lastKey.c); break;
+			InputCommandType input = handleInputCommand(engine.lastKey.vk);
+			switch(input) {
+			case MOVE_N:  dy = -1; break;
+			case MOVE_S:  dy =  1; break;
+			case MOVE_W:  dx = -1; break;
+			case MOVE_E:  dx =  1; break;
+			case MOVE_NW: dx = -1; dy = -1; break;
+			case MOVE_NE: dx =  1; dy = -1; break;
+			case MOVE_SW: dx = -1; dy =  1; break;
+			case MOVE_SE: dx =  1; dy =  1; break;
+			case IDLE: handleActionKey(owner, '.'); break;
+			case CHAR: handleActionKey(owner, engine.lastKey.c); break;
+			case NULL_INPUT:
 			default: break;
 			}
 			if(dx != 0 || dy != 0) {
@@ -95,17 +93,20 @@ void playerAi::handleActionKey(shared_ptr<Entity> owner, int ascii) {
 		{
 			TCOD_key_t key = chooseInteractDirection();
 			int dx = 0, dy = 0;
-			switch(key.vk) {
-				case TCODK_UP:		dy = -1; break;
-				case TCODK_KP8:		dy = -1; break;
-				case TCODK_DOWN:	dy =  1; break;
-				case TCODK_KP2:		dy =  1; break;
-				case TCODK_LEFT:	dx = -1; break;
-				case TCODK_KP4:		dx = -1; break;
-				case TCODK_RIGHT:	dx =  1; break;
-				case TCODK_KP6:		dx =  1; break;
-				case TCODK_ESCAPE:
-				default:			engine.ui->message(TCODColor::grey, "Canceled."); return;
+			InputCommandType input = handleInputCommand(key.vk);
+			switch(input) {
+			case MOVE_N:  dy = -1; break;
+			case MOVE_S:  dy =  1; break;
+			case MOVE_W:  dx = -1; break;
+			case MOVE_E:  dx =  1; break;
+			case MOVE_NW: dx = -1; dy = -1; break;
+			case MOVE_NE: dx =  1; dy = -1; break;
+			case MOVE_SW: dx = -1; dy =  1; break;
+			case MOVE_SE: dx =  1; dy =  1; break;
+			case IDLE:
+			case CHAR:
+			case NULL_INPUT:
+			default: engine.ui->message(TCODColor::grey, "Canceled."); return;
 			}
 			bool found = false;
 			for(auto & ent : engine.entityList) {
@@ -201,12 +202,42 @@ shared_ptr<Spell> playerAi::chooseFromSpells(shared_ptr<Entity> owner) {
 }
 
 TCOD_key_t playerAi::chooseInteractDirection() const {
-	engine.ui->message(TCODColor::cyan, "Choose a direction to interact (Esc to cancel).");
+	engine.ui->message(TCODColor::white, "Choose a direction to interact (Esc to cancel).");
 	engine.ui->render();
 	TCODConsole::flush();
 	TCOD_key_t key;
 	TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, true);
 	return key;
+}
+
+playerAi::InputCommandType playerAi::handleInputCommand(TCOD_keycode_t key) {
+	switch(key) {
+	case TCODK_UP:					// Up
+	case TCODK_KP8: return MOVE_N;
+
+	case TCODK_DOWN:				// Down
+	case TCODK_KP2: return MOVE_S;
+	
+	case TCODK_LEFT:				// Left
+	case TCODK_KP4: return MOVE_W;
+	
+	case TCODK_RIGHT:				// Right
+	case TCODK_KP6: return MOVE_E;
+
+	case TCODK_KP7: return MOVE_NW;	// Up-Left
+
+	case TCODK_KP9: return MOVE_NE;	// Up-Right
+
+	case TCODK_KP1: return MOVE_SW;	// Down-Left
+
+	case TCODK_KP3: return MOVE_SE;	// Down-Right
+
+	case TCODK_KP5: return IDLE;	// Idle
+
+	case TCODK_CHAR: return CHAR;	// Char
+
+	default: return NULL_INPUT;		// Nothing
+	}
 }
 
 

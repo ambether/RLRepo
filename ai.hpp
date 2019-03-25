@@ -26,6 +26,9 @@ protected:
 	shared_ptr<Entity> chooseFromInv(shared_ptr<Entity> owner);
 	shared_ptr<Spell> chooseFromSpells(shared_ptr<Entity> owner);
 	TCOD_key_t chooseInteractDirection() const;
+
+	enum InputCommandType { MOVE_N, MOVE_S, MOVE_W, MOVE_E, MOVE_NE, MOVE_NW, MOVE_SE, MOVE_SW, IDLE, CHAR, NULL_INPUT };
+	InputCommandType handleInputCommand(TCOD_keycode_t key);
 };
 
 class mobAi : public Ai {
