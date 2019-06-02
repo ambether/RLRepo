@@ -1,9 +1,10 @@
 #include "main.hpp"
 
-static const int rsMIN = 6, rsMAX = 12;
-static const int rMonstersMAX = 3;
-static const int rItemsMAX = 3;
+//static const int rsMIN = 6, rsMAX = 12;
+//static const int rMonstersMAX = 3;
+//static const int rItemsMAX = 3;
 
+/*
 class bspList : public ITCODBspCallback {
 private:
 	Map & dungeon;
@@ -32,7 +33,9 @@ public:
 		return true;
 	}
 };
+*/
 
+/*
 Map::Map(int width, int height) : width(width), height(height) {
 	tiles = new Tile[width * height];
 	map = std::make_shared<TCODMap>(width, height);
@@ -42,8 +45,17 @@ Map::Map(int width, int height) : width(width), height(height) {
 	bsp.traverseInvertedLevelOrder(&listener, NULL);
 	placeDoors();
 }
+*/
 
-Map::~Map() { delete [] tiles; }
+Map::Map(int width, int height) : width(width), height(height) {
+	exploredTiles = new Tile[width * height];
+	map = std::make_shared<TCODMap>(width, height);
+	std::random_device seed;
+	rng = std::make_shared<TCODRandom>(seed());
+	generateMap(); // ??????
+}
+
+Map::~Map() { delete [] exploredTiles; }
 
 int Map::getWidth() const { return width; }
 
@@ -57,11 +69,11 @@ bool Map::canWalk(int x, int y) const {
 
 bool Map::isWall(int x, int y) const { return !map->isWalkable(x, y); }
 
-bool Map::isExplored(int x, int y) const { return tiles[x + y*width].isExplored; }
+bool Map::isExplored(int x, int y) const { return exploredTiles[x + y*width].isExplored; }
 
 bool Map::isInFov(int x, int y) const {
 	if(x < 0 || x >= width || y < 0 || y >= height) { return false; }
-	if(map->isInFov(x, y)) { tiles[x + y * width].isExplored = true; return true; }
+	if(map->isInFov(x, y)) { exploredTiles[x + y * width].isExplored = true; return true; }
 	return false;
 }
 
@@ -81,6 +93,123 @@ void Map::render(TCODConsole * renderConsole) const {
 	}
 }
 
+void Map::setTransparent(int x, int y, bool transparent) { map->setProperties(x, y, transparent, map->isWalkable(x, y)); }
+
+void Map::generateMap() {
+	// Make initial room
+	createRoom(width / 2, height / 2, EAST);
+
+	int currentFeatures = 1; // Starts at 1 because of the initial room
+
+	while(currentFeatures < MAX_FEATURES) {
+		int newx = 0, newy = 0;
+		Direction dir = NONE;
+		for(int testing = 0; testing < 1000; ++testing) { // Test random tiles to find a place to put a new feature
+			newx = rng->getInt(0, width - 1);
+			newy = rng->getInt(0, height - 1);
+			dir = NONE;
+			// Try to find a non-walkable tile with an adjacent walkable tile
+			if(canWalk(newx, newy)) continue; // Go back to the top of the loop
+			if(canWalk(newx, newy + 1)) {
+				if(createRoom(newx, newy - 1, NORTH)) { 
+					++currentFeatures; 
+					map->setProperties(newx, newy, true, true); // change to door later
+					map->setProperties(newx, newy - 1, true, true);
+					break;
+				}
+			}
+			else if(canWalk(newx - 1, newy)) {
+				if(createRoom(newx + 1, newy, EAST)) { 
+					++currentFeatures;
+					map->setProperties(newx, newy, true, true); // change to door later
+					map->setProperties(newx + 1, newy, true, true);
+					break; 
+				}
+			}
+			else if(canWalk(newx, newy - 1)) {
+				if(createRoom(newx, newy + 1, SOUTH)) { 
+					++currentFeatures;
+					map->setProperties(newx, newy, true, true); // change to door later
+					map->setProperties(newx, newy + 1, true, true);
+					break; 
+				}
+			}
+			else if(canWalk(newx + 1, newy)) {
+				if(createRoom(newx - 1, newy, WEST)) { 
+					++currentFeatures;
+					map->setProperties(newx, newy, true, true); // change to door later
+					map->setProperties(newx - 1, newy, true, true);
+					break; 
+				}
+			}
+		}
+	}
+}
+
+void Map::dig(const Rectangle & rect) {
+	for(int x = rect.x; x < rect.x + rect.width; ++x) {
+		for(int y = rect.y; y < rect.y + rect.height; ++y) {
+			map->setProperties(x, y, true, true);
+		}
+	}
+}
+
+bool Map::canPutRoom(const Rectangle & room) const {
+	if(room.x < 1 || room.y < 1 || room.x + room.width > width 
+		|| room.y + room.height > height - 1) { // Check if room is out of bounds
+		return false;
+	}
+	for(int y = room.y; y < room.y + room.height; ++y) {
+		for(int x = room.x; x < room.x + room.width; ++x) {
+			if(canWalk(x, y)) { return false; } // Check if this room will overlap an existing room
+		}
+	}
+	return true;
+}
+
+bool Map::createRoom(int x, int y, Direction dir) {
+	Rectangle room;
+
+	room.width = rng->getInt(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+	room.height = rng->getInt(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+	room.x = x;
+	room.y = y;
+
+	switch(dir) {
+	case NORTH:
+	{	
+		room.x = x - room.width / 2;
+		room.y = y - room.height;
+		break;
+	}
+	case EAST:
+	{
+		room.x = x + 1;
+		room.y = y - room.height / 2;
+		break;
+	}
+	case SOUTH:
+	{
+		room.x = x - room.width / 2;
+		room.y = y + 1;
+		break;
+	}
+	case WEST:
+	{
+		room.x = x - room.width;
+		room.y = y - room.height / 2;
+		break;
+	}
+	}
+
+	if(canPutRoom(room)) { 
+		dig(room); 
+		return true; // Room successfully created
+	}
+	return false; // Room was not created
+}
+
+/*
 void Map::addMonster(int x, int y) {
 	std::random_device seed;
 	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
@@ -155,19 +284,10 @@ void Map::placeDoors() {
 		}
 	}
 }
+*/
 
-void Map::setTransparent(int x, int y, bool transparent) { map->setProperties(x, y, transparent, map->isWalkable(x, y)); }
 
-void Map::dig(int x1, int y1, int x2, int y2) {
-	if(x2 < x1) { int tmp = x2; x2 = x1; x1 = tmp; }
-	if(y2 < y1) { int tmp = y2; y2 = y1; y1 = tmp; }
-	for(int tx = x1; tx <= x2; ++tx) {
-		for(int ty = y1; ty <= y2; ++ty) {
-			map->setProperties(tx, ty, true, true);
-		}
-	}
-}
-
+/*
 void Map::createRoom(bool first, int x1, int y1, int x2, int y2) {
 	rooms.push_back(RoomData(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
 	dig(x1, y1, x2, y2);
@@ -217,3 +337,4 @@ void Map::addItem(int x, int y) {
 		engine.inactiveEntities.push_back(item);
 	}
 }
+*/
