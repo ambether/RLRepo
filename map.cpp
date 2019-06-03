@@ -2,9 +2,11 @@
 
 Map::Map(int width, int height) : width(width), height(height) {
 	tiles = new Tile[width * height];
+	rooms = vector<Rectangle>();
 	map = std::make_shared<TCODMap>(width, height);
 	std::random_device seed;
 	rng = std::make_shared<TCODRandom>(seed());
+	currentFeatures = 0;
 	generateMap();
 }
 
@@ -22,7 +24,7 @@ bool Map::canWalk(int x, int y) const {
 
 bool Map::isWall(int x, int y) const { return !map->isWalkable(x, y); }
 
-bool Map::isExplored(int x, int y) const { return tiles[x + y*width].isExplored; }
+bool Map::isExplored(int x, int y) const { return getTile(x, y).isExplored; }
 
 bool Map::isInFov(int x, int y) const {
 	if(x < 0 || x >= width || y < 0 || y >= height) { return false; }
@@ -48,17 +50,19 @@ void Map::render(TCODConsole * renderConsole) const {
 
 void Map::setTransparent(int x, int y, bool transparent) { map->setProperties(x, y, transparent, map->isWalkable(x, y)); }
 
-Tile & Map::getTile(int x, int y) const { return tiles[x + y*width]; }
+Map::Tile & Map::getTile(int x, int y) const { return tiles[x + y*width]; }
 
 void Map::generateMap() {
 	// Make initial room
 	createFeature(width / 2, height / 2, Direction(rng->getInt(1, 4)), Tile::ROOM); // A random int from 1-4 gives you N/S/E/W from Direction
 
-	int currentFeatures = 1; // Starts at 1 because of the initial room
+	currentFeatures = 1; // Starts at 1 because of the initial room
 
-	for(currentFeatures; currentFeatures < MAX_FEATURES; ++currentFeatures) {
-		generateFeature();
-	}
+	// Generate features until the limit is reached
+	while(currentFeatures <= MAX_FEATURES) { generateFeature(); }
+
+	// Place the Entities on the Map
+	placeEntities();
 }
 
 // Digs out tiles in a rectangle and sets them to the appropriate TileType
@@ -76,65 +80,99 @@ void Map::createDoor(int x, int y) {
 	door->x = x;
 	door->y = y;
 	setTransparent(x, y, false);
-	engine.entityList.push_back(door); engine.inactiveEntities.push_back(door);
+	engine.entityList.push_back(door);
+	engine.inactiveEntities.push_back(door);
 }
 
-// Checks if a room/corridor/etc is able to be placed without going out of bounds or overlapping other features
-bool Map::canPutFeature(const Rectangle & rect) const {
-	if(rect.x < 1 || rect.y < 1 || rect.x + rect.width > width 
-		|| rect.y + rect.height > height - 1) { // Check if rect is out of bounds
-		return false;
-	}
-	for(int y = rect.y; y < rect.y + rect.height; ++y) {
-		for(int x = rect.x; x < rect.x + rect.width; ++x) {
-			if(canWalk(x, y)) { return false; } // Check if this rect will overlap an existing rect
+// Places the Player and randomly adds monsters to rooms
+void Map::placeEntities() {
+	const static int MONSTER_CHANCE = 65,
+		MAX_MONSTERS = 5;
+
+	Rectangle room = rooms[0];
+	engine.player->x = room.x + room.width / 2;
+	engine.player->y = room.y + room.height / 2;
+
+	for(int i = 1; i < rooms.size(); ++i) { // Iterate through all rooms other than the first
+		room = rooms[i];
+		int chance = rng->getInt(1, 100); // Decide randomly to add monsters to the room
+		if(chance <= MONSTER_CHANCE) {
+			int numMonsters = rng->getInt(1, MAX_MONSTERS); // Decide on a random number of monsters to place
+			int x, y;
+			for(int i = 0; i < numMonsters; ++i) { // Add monsters at random coordinates inside the room
+				x = rng->getInt(room.x, room.x + room.width - 1);
+				y = rng->getInt(room.y, room.y + room.height - 1);
+				addMonster(x, y);
+			}
 		}
 	}
-	return true;
+}
+
+// Adds a random monster at the given x, y
+void Map::addMonster(int x, int y) {
+	const static int GOBBO_CHANCE = 70, HOBBO_CHANCE = 30;
+
+	const char * monsterName = "";
+
+	int chance = rng->getInt(1, 100);
+	if(chance <= GOBBO_CHANCE) { // chance <= 70
+		monsterName = "Gobbo";
+	}
+	else if(chance <= GOBBO_CHANCE + HOBBO_CHANCE) { // 70 < chance <= 70 + 30
+		monsterName = "Hobbo";
+	}
+	std::shared_ptr<Entity> monster = engine.entityTemplates[monsterName]->clone();
+	monster->x = x;
+	monster->y = y;
+	engine.entityList.push_back(monster);
+	engine.activeEntities.push_back(monster);
 }
 
 void Map::generateFeature(Rectangle * bounds) {
 	int newx = 0, newy = 0;
 	Direction dir = NONE;
+	
 	for(int testing = 0; testing < 1000; ++testing) { // Test random tiles to find a place to put a new feature
 		if(bounds) { // If a bounds rectangle is defined, only search within those bounds
 			newx = rng->getInt(bounds->x - 1, bounds->x + bounds->width);
 			newy = rng->getInt(bounds->y - 1, bounds->y + bounds->height);
 		}
-		else {
+		else { // Pick a random spot on the Map
 			newx = rng->getInt(1, width - 1);
 			newy = rng->getInt(1, height - 1);
 		}
-		dir = NONE;
+
+		dir = NONE; // reset the direction
+
 		// Try to find a wall or corridor tile
 		if(getTile(newx, newy).tileType == Tile::ROOM) continue; // Start over if the tile is a room, otherwise it's a wall or corridor
 		
-		if(getTile(newx, newy + 1).tileType == Tile::ROOM || getTile(newx, newy + 1).tileType == Tile::CORRIDOR) {
-			if(createFeature(newx, newy - 1, NORTH)) {
+		if(getTile(newx, newy + 1).tileType == Tile::ROOM || getTile(newx, newy + 1).tileType == Tile::CORRIDOR) { // Check if the tile is the northern edge of a feature
+			if(createFeature(newx, newy - 1, NORTH)) { // Try to create a feature to the north
 				map->setProperties(newx, newy, true, true); // Clear a path to the new feature
 				createDoor(newx, newy); // Add a door
 				map->setProperties(newx, newy - 1, true, true); // Clean in front of door
 				break;
 			}
 		}
-		else if(getTile(newx - 1, newy).tileType == Tile::ROOM || getTile(newx - 1, newy).tileType == Tile::CORRIDOR) {
-			if(createFeature(newx + 1, newy, EAST)) {
+		else if(getTile(newx - 1, newy).tileType == Tile::ROOM || getTile(newx - 1, newy).tileType == Tile::CORRIDOR) { // Check if the tile is on the eastern edge of a feature
+			if(createFeature(newx + 1, newy, EAST)) { // Try to create a feature to the east
 				map->setProperties(newx, newy, true, true); // Clear a path to the new feature
 				createDoor(newx, newy); // Add a door
 				map->setProperties(newx + 1, newy, true, true); // Clean in front of door
 				break;
 			}
 		}
-		else if(getTile(newx, newy - 1).tileType == Tile::ROOM || getTile(newx, newy - 1).tileType == Tile::CORRIDOR) {
-			if(createFeature(newx, newy + 1, SOUTH)) {
+		else if(getTile(newx, newy - 1).tileType == Tile::ROOM || getTile(newx, newy - 1).tileType == Tile::CORRIDOR) { // Check if the tile is on the southern edge of a feature
+			if(createFeature(newx, newy + 1, SOUTH)) { // Try to create a feature to the south
 				map->setProperties(newx, newy, true, true); // Clear a path to the new feature
 				createDoor(newx, newy); // Add a door
 				map->setProperties(newx, newy + 1, true, true); // Clean in front of door
 				break;
 			}
 		}
-		else if(getTile(newx + 1, newy).tileType == Tile::ROOM || getTile(newx + 1, newy).tileType == Tile::CORRIDOR) {
-			if(createFeature(newx - 1, newy, WEST)) {
+		else if(getTile(newx + 1, newy).tileType == Tile::ROOM || getTile(newx + 1, newy).tileType == Tile::CORRIDOR) { // Check if the tile is on the western edge of a feature
+			if(createFeature(newx - 1, newy, WEST)) { // Try to create a feature to the west
 				map->setProperties(newx, newy, true, true); // Clear a path to the new feature
 				createDoor(newx, newy); // Add a door
 				map->setProperties(newx - 1, newy, true, true); // Clean in front of door
@@ -144,10 +182,25 @@ void Map::generateFeature(Rectangle * bounds) {
 	}
 }
 
+// Checks if a room/corridor/etc is able to be placed without going out of bounds or overlapping other features
+bool Map::canPutFeature(const Rectangle & rect) const {
+	if(rect.x < 1 || rect.y < 1 || rect.x + rect.width > width - 1
+		|| rect.y + rect.height > height - 1) { // Check if rect is out of bounds
+		return false;
+	}
+	for(int y = rect.y - 1; y < rect.y + rect.height + 1; ++y) { // Check an extra tile around the rectangle so that rooms dont accidentally connect
+		for(int x = rect.x - 1; x < rect.x + rect.width + 1; ++x) {
+			if(canWalk(x, y)) { return false; } // Check if this rect will overlap an existing rect
+		}
+	}
+	return true;
+}
+
 bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 	const static int ROOM_CHANCE = 85;
 	int chance = 0;
 
+	// If tileType is explicitly defined set the chance to guarentee that TileType
 	if(tileType == Tile::ROOM) 
 		chance = 1;
 	else if(tileType == Tile::CORRIDOR) 
@@ -156,8 +209,8 @@ bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 		chance = rng->getInt(1, 100);
 
 	if(chance <= ROOM_CHANCE) {
+		// Define a randomly sized rectangle
 		Rectangle room;
-
 		room.width = rng->getInt(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
 		room.height = rng->getInt(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
 		room.x = x;
@@ -192,14 +245,18 @@ bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 
 		if(canPutFeature(room)) {
 			dig(room, Tile::ROOM);
+			rooms.push_back(room);
+			++currentFeatures;
 			return true; // Room successfully created
 		}
 	}
 	else { // Corridor (for now)
+		// Define a randomly long corridor
 		Rectangle corridor;
 		corridor.x = x;
 		corridor.y = y;
 		int length = rng->getInt(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+
 		switch(dir) {
 		case NORTH:
 		{
@@ -212,14 +269,12 @@ bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 		{
 			corridor.width = length;
 			corridor.height = 1;
-			corridor.x = x + 1;
 			break;
 		}
 		case SOUTH:
 		{
 			corridor.height = length;
 			corridor.width = 1;
-			corridor.y = y + 1;
 			break;
 		}
 		case WEST:
@@ -232,120 +287,16 @@ bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 
 		if(canPutFeature(corridor)) {
 			dig(corridor, Tile::CORRIDOR);
-			generateFeature(&corridor); // If a corridor is created, add a feature to it (a corridor would be made to go somewhere!)
+			++currentFeatures;
+			if(currentFeatures < MAX_FEATURES) { generateFeature(&corridor); } // If a corridor is created, add a feature to it (a corridor would be made to go somewhere!)
 			return true; // Corridor successfully created
 		}
 	}
 	return false;
 }
 
-/*
-void Map::addMonster(int x, int y) {
-	std::random_device seed;
-	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
-	int roll = rng->getInt(1, 100);
-	
-	const char * monsterName = "";
-
-	if(roll < 80) {	monsterName = "Gobbo"; }
-	else { monsterName = "Hobbo"; }
-
-	auto it = engine.entityTemplates.find(monsterName); // Try to find a template for monsterName.
-	if(it != engine.entityTemplates.end()) {
-		shared_ptr<Entity> monster = it->second->clone();
-		monster->x = x;
-		monster->y = y;
-		engine.entityList.push_back(monster);
-		engine.activeEntities.push_back(monster);
-	}
-}
-
-void Map::addDoor(int x, int y) {
-	shared_ptr<Entity> door = std::make_shared<Entity>(x, y, "door", '+', TCODColor::darkAmber);
-	door->interaction = std::make_shared<DoorInteraction>();
-	setTransparent(x, y, false);
-	engine.entityList.push_back(door); engine.inactiveEntities.push_back(door);
-}
-
-// Checks the edges of the rooms for gaps and only places a
-// door in a non-wall on the edge if it has a wall on either side of it.
-void Map::placeDoors() {
-	for(int i = 0; i < rooms.size(); ++i) {
-		RoomData rd = rooms[i];
-
-		bool wallLastTop = true, wallLastBottom = true;
-		bool wallCurrentTop = false, wallCurrentBottom = false;
-		for(int x = rd.x; x < rd.x + rd.w; ++x) { // Iterate over the horizontal edges
-			// Check the top edge
-			wallCurrentTop = isWall(x, rd.y - 1);
-			if(wallCurrentTop == false && wallLastTop == true) {
-				// Only add a door if the next space on the edge is a wall
-				if(isWall(x + 1, rd.y - 1)) { addDoor(x, rd.y - 1); }
-			}
-
-			// Check the bottom edge
-			wallCurrentBottom = isWall(x, rd.y + rd.h);
-			if(wallCurrentBottom == false && wallLastBottom == true) {
-				// Only add a door if the next space on the edge is a wall
-				if(isWall(x + 1, rd.y + rd.h)) { addDoor(x, rd.y + rd.h); }
-			}
-			wallLastTop = wallCurrentTop;
-			wallLastBottom = wallCurrentBottom;
-		}
-		
-		bool wallLastLeft = true, wallLastRight = true;
-		bool wallCurrentLeft = false, wallCurrentRight = false;
-		for(int y = rd.y; y < rd.y + rd.h; ++y) { // Iterate over the vertical edges
-			// Check the left edge
-			wallCurrentLeft = isWall(rd.x - 1, y);
-			if(wallCurrentLeft == false && wallLastLeft == true) {
-				// Only add a door if the next space on the edge is a wall
-				if(isWall(rd.x - 1, y + 1)) { addDoor(rd.x - 1, y); } 
-			}
-
-			// Check the right edge
-			wallCurrentRight = isWall(rd.x + rd.w, y);
-			if(wallCurrentRight == false && wallLastRight == true) {
-				// Only add a door if the next space on the edge is a wall
-				if(isWall(rd.x + rd.w, y + 1)) { addDoor(rd.x + rd.w, y); } 
-			}
-			wallLastLeft = wallCurrentLeft;
-			wallLastRight = wallCurrentRight;
-		}
-	}
-}
-*/
 
 /*
-void Map::createRoom(bool first, int x1, int y1, int x2, int y2) {
-	rooms.push_back(RoomData(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
-	dig(x1, y1, x2, y2);
-	int cx = (x1 + x2) / 2;
-	int cy = (y1 + y2) / 2;
-	
-	if(first) {
-		engine.player->x = cx;
-		engine.player->y = cy;
-	} 
-	else {
-		TCODRandom * rng = TCODRandom::getInstance();
-		int nbMonsters = rng->getInt(0, rMonstersMAX);
-		while(nbMonsters > 0) {
-			int x = rng->getInt(x1, x2),
-				y = rng->getInt(y1, y2);
-			if(canWalk(x, y)) { addMonster(x, y); }
-			--nbMonsters;
-		}
-		int nbItems = rng->getInt(0, rItemsMAX);
-		while(nbItems > 0) {
-			int x = rng->getInt(x1, x2),
-				y = rng->getInt(y1, y2);
-			if(canWalk(x, y)) { addItem(x, y); }
-			--nbItems;
-		}
-	}
-}
-
 void Map::addItem(int x, int y) {
 	std::random_device seed;
 	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());

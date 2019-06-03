@@ -1,11 +1,5 @@
 #pragma once
 
-struct Tile {
-	bool isExplored;
-	enum TileType { NONE, WALL, ROOM, CORRIDOR } tileType;
-	Tile() : isExplored(false), tileType(WALL) {}
-};
-
 class Map {
 public:
 	Map(int width, int height);
@@ -21,10 +15,14 @@ public:
 
 	void computeFov();
 	void render(TCODConsole * renderConsole) const;
-	//void addMonster(int x, int y);
 	void setTransparent(int x, int y, bool transparent);
 
 private:
+	struct Tile {
+		bool isExplored;
+		enum TileType { NONE, WALL, ROOM, CORRIDOR } tileType;
+		Tile() : isExplored(false), tileType(WALL) {}
+	};
 	struct Rectangle {
 		int x, y;
 		int width, height;
@@ -32,11 +30,12 @@ private:
 
 	const static int ROOM_SIZE_MIN = 6, ROOM_SIZE_MAX = 15,
 		MAX_FEATURES = 15;
-	
 	enum Direction { NONE, NORTH, EAST, SOUTH, WEST };
 
 	int width, height;
+	int currentFeatures;
 	Tile * tiles;
+	vector<Rectangle> rooms;
 	shared_ptr<TCODMap> map;
 	shared_ptr<TCODRandom> rng;
 
@@ -46,6 +45,8 @@ private:
 	void generateFeature(Rectangle * bounds = nullptr);
 	void dig(const Rectangle & rect, Tile::TileType tileType);
 	void createDoor(int x, int y);
+	void placeEntities();
+	void addMonster(int x, int y);
 
 	bool canPutFeature(const Rectangle & rect) const;
 	bool createFeature(int x, int y, Direction dir, Tile::TileType tileType = Tile::NONE);
