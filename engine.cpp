@@ -33,6 +33,7 @@ Engine::Engine(int sW, int sH) : fovRadius(10), screenWidth(sW), screenHeight(sH
 	
 	// Make the dungeon
 	dungeon = std::make_shared<Map>(130, 80);
+
 	// Init the ui
 	ui = std::make_shared<Ui>();
 	ui->message(TCODColor::red, "Whalecum nerd.");

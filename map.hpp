@@ -1,13 +1,5 @@
 #pragma once
 
-struct Tile {
-	bool canWalk;
-	bool isExplored;
-
-	Tile() : canWalk(false), isExplored(false) {}
-};
-
-
 class Map {
 public:
 	Map(int width, int height);
@@ -23,26 +15,40 @@ public:
 
 	void computeFov();
 	void render(TCODConsole * renderConsole) const;
-	void addMonster(int x, int y);
-	void addDoor(int x, int y);
-	void placeDoors();
 	void setTransparent(int x, int y, bool transparent);
 
 private:
-	struct RoomData {
-		int x, y, w, h;
-		RoomData(int x, int y, int w, int h) : x(x), y(y), w(w), h(h) {}
+	struct Tile {
+		bool isExplored;
+		enum TileType { NONE, WALL, ROOM, CORRIDOR } tileType;
+		Tile() : isExplored(false), tileType(WALL) {}
+	};
+	struct Rectangle {
+		int x, y;
+		int width, height;
 	};
 
+	const static int ROOM_SIZE_MIN = 6, ROOM_SIZE_MAX = 15,
+		MAX_FEATURES = 15;
+	enum Direction { NONE, NORTH, EAST, SOUTH, WEST };
+
 	int width, height;
+	int currentFeatures;
 	Tile * tiles;
+	vector<Rectangle> rooms;
 	shared_ptr<TCODMap> map;
+	shared_ptr<TCODRandom> rng;
 
-	vector<RoomData> rooms;
+	Tile & getTile(int x, int y) const;
 
-	friend class bspList;
-	
-	void dig(int x1, int y1, int x2, int y2);
-	void createRoom(bool first, int x1, int y1, int x2, int y2);
+	void generateMap();
+	void generateFeature(Rectangle * bounds = nullptr);
+	void dig(const Rectangle & rect, Tile::TileType tileType);
+	void createDoor(int x, int y);
+	void placeEntities();
+	void addMonster(int x, int y);
 	void addItem(int x, int y);
+
+	bool canPutFeature(const Rectangle & rect) const;
+	bool createFeature(int x, int y, Direction dir, Tile::TileType tileType = Tile::NONE);
 };
