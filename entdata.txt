@@ -52,7 +52,7 @@ Entity "Hobbo" {
 
 Entity "Door" {
 	symbol='+'
-	col="#BF2B00"
+	col="128,64,0" // darker orange
 	blocks=true
 	Interaction "doorInteraction" {}
 }
