@@ -59,7 +59,7 @@ void Map::generateMap() {
 	currentFeatures = 1; // Starts at 1 because of the initial room
 
 	// Generate features until the limit is reached
-	while(currentFeatures <= MAX_FEATURES) { generateFeature(); }
+	while(currentFeatures < MAX_FEATURES) { generateFeature(); }
 
 	// Place the Entities on the Map
 	placeEntities();
@@ -76,18 +76,21 @@ void Map::dig(const Rectangle & rect, Tile::TileType tileType) {
 }
 
 void Map::createDoor(int x, int y) {
-	shared_ptr<Entity> door = engine.entityTemplates["Door"]->clone();
-	door->x = x;
-	door->y = y;
-	setTransparent(x, y, false);
-	engine.entityList.push_back(door);
-	engine.inactiveEntities.push_back(door);
+	auto it = engine.entityTemplates.find("Door");
+	if(it != engine.entityTemplates.end()) {
+		shared_ptr<Entity> door = it->second->clone();
+		door->x = x;
+		door->y = y;
+		setTransparent(x, y, false);
+		engine.entityList.push_back(door);
+		engine.inactiveEntities.push_back(door);
+	}
 }
 
 // Places the Player and randomly adds monsters to rooms
 void Map::placeEntities() {
-	const static int MONSTER_CHANCE = 65,
-		MAX_MONSTERS = 5;
+	const static int MONSTER_CHANCE = 65, MAX_MONSTERS = 5,
+		ITEM_CHANCE = 40, MAX_ITEMS;
 
 	Rectangle room = rooms[0];
 	engine.player->x = room.x + room.width / 2;
@@ -103,6 +106,16 @@ void Map::placeEntities() {
 				x = rng->getInt(room.x, room.x + room.width - 1);
 				y = rng->getInt(room.y, room.y + room.height - 1);
 				addMonster(x, y);
+			}
+		}
+		chance = rng->getInt(1, 100); // Decide randomly to add items to the room
+		if(chance <= ITEM_CHANCE) {
+			int numItems = rng->getInt(1, MAX_ITEMS); // Decide on a random number of items to place
+			int x, y;
+			for(int i = 0; i < numItems; ++i) { // Add items at random coordinates inside the room
+				x = rng->getInt(room.x, room.x + room.width - 1);
+				y = rng->getInt(room.y, room.y + room.height - 1);
+				addItem(x, y);
 			}
 		}
 	}
@@ -121,11 +134,34 @@ void Map::addMonster(int x, int y) {
 	else if(chance <= GOBBO_CHANCE + HOBBO_CHANCE) { // 70 < chance <= 70 + 30
 		monsterName = "Hobbo";
 	}
-	std::shared_ptr<Entity> monster = engine.entityTemplates[monsterName]->clone();
-	monster->x = x;
-	monster->y = y;
-	engine.entityList.push_back(monster);
-	engine.activeEntities.push_back(monster);
+	auto it = engine.entityTemplates.find(monsterName);
+	if(it != engine.entityTemplates.end()) { // Try to find a template for the monster
+		std::shared_ptr<Entity> monster = it->second->clone();
+		monster->x = x;
+		monster->y = y;
+		engine.entityList.push_back(monster);
+		engine.activeEntities.push_back(monster);
+	}
+}
+
+void Map::addItem(int x, int y) {
+	const static int POTION_CHANCE = 70, F_SCROLL_CHANCE = 20, LB_SCROLL_CHANCE = 10;
+
+	int chance = rng->getInt(1, 100);
+	const char * itemName = "";
+
+	if(chance <= POTION_CHANCE) { itemName = "Healing Potion"; }
+	else if(chance <= POTION_CHANCE + F_SCROLL_CHANCE) { itemName = "Fireball Scroll"; }
+	else if(chance <= POTION_CHANCE + F_SCROLL_CHANCE + LB_SCROLL_CHANCE) { itemName = "Lightning Bolt Scroll"; }
+
+	auto it = engine.itemTemplates.find(itemName);
+	if(it != engine.itemTemplates.end()) { // Try to find a template for the item
+		shared_ptr<Entity> item = it->second->clone();
+		item->x = x;
+		item->y = y;
+		engine.entityList.push_back(item);
+		engine.inactiveEntities.push_back(item);
+	}
 }
 
 void Map::generateFeature(Rectangle * bounds) {
@@ -294,27 +330,3 @@ bool Map::createFeature(int x, int y, Direction dir, Tile::TileType tileType) {
 	}
 	return false;
 }
-
-
-/*
-void Map::addItem(int x, int y) {
-	std::random_device seed;
-	shared_ptr<TCODRandom> rng = std::make_shared<TCODRandom>(seed());
-	int roll = rng->getInt(1, 100);
-
-	const char * itemName = "";
-
-	if(roll < 70) {	itemName = "Healing Potion"; }
-	else if(roll < 70 + 10) { itemName = "Lightning Bolt Scroll"; }
-	else if(roll < 70 + 10 + 10) { itemName = "Fireball Scroll"; }
-	
-	auto it = engine.itemTemplates.find(itemName); // Try to find a template for itemName.
-	if(it != engine.itemTemplates.end()) {
-		shared_ptr<Entity> item = it->second->clone();
-		item->x = x;
-		item->y = y;
-		engine.entityList.push_back(item);
-		engine.inactiveEntities.push_back(item);
-	}
-}
-*/

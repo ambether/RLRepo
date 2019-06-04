@@ -47,6 +47,7 @@ private:
 	void createDoor(int x, int y);
 	void placeEntities();
 	void addMonster(int x, int y);
+	void addItem(int x, int y);
 
 	bool canPutFeature(const Rectangle & rect) const;
 	bool createFeature(int x, int y, Direction dir, Tile::TileType tileType = Tile::NONE);
