@@ -76,15 +76,14 @@ void Map::dig(const Rectangle & rect, Tile::TileType tileType) {
 }
 
 void Map::createDoor(int x, int y) {
-	auto it = engine.entityTemplates.find("Door");
-	if(it != engine.entityTemplates.end()) {
-		shared_ptr<Entity> door = it->second->clone();
-		door->x = x;
-		door->y = y;
-		setTransparent(x, y, false);
-		engine.entityList.push_back(door);
-		engine.inactiveEntities.push_back(door);
-	}
+	shared_ptr<Entity> door;
+	try { door = engine.entityTemplates.at("Door")->clone(); }
+	catch(std::out_of_range & e) { return; }
+	door->x = x;
+	door->y = y;
+	setTransparent(x, y, false);
+	engine.entityList.push_back(door);
+	engine.inactiveEntities.push_back(door);
 }
 
 // Places the Player and randomly adds monsters to rooms
@@ -134,14 +133,13 @@ void Map::addMonster(int x, int y) {
 	else if(chance <= GOBBO_CHANCE + HOBBO_CHANCE) { // 70 < chance <= 70 + 30
 		monsterName = "Hobbo";
 	}
-	auto it = engine.entityTemplates.find(monsterName);
-	if(it != engine.entityTemplates.end()) { // Try to find a template for the monster
-		std::shared_ptr<Entity> monster = it->second->clone();
-		monster->x = x;
-		monster->y = y;
-		engine.entityList.push_back(monster);
-		engine.activeEntities.push_back(monster);
-	}
+	shared_ptr<Entity> monster;
+	try { monster = engine.entityTemplates.at(monsterName)->clone(); }
+	catch(std::out_of_range) { return; }
+	monster->x = x;
+	monster->y = y;
+	engine.entityList.push_back(monster);
+	engine.activeEntities.push_back(monster);
 }
 
 void Map::addItem(int x, int y) {
@@ -154,14 +152,13 @@ void Map::addItem(int x, int y) {
 	else if(chance <= POTION_CHANCE + F_SCROLL_CHANCE) { itemName = "Fireball Scroll"; }
 	else if(chance <= POTION_CHANCE + F_SCROLL_CHANCE + LB_SCROLL_CHANCE) { itemName = "Lightning Bolt Scroll"; }
 
-	auto it = engine.itemTemplates.find(itemName);
-	if(it != engine.itemTemplates.end()) { // Try to find a template for the item
-		shared_ptr<Entity> item = it->second->clone();
-		item->x = x;
-		item->y = y;
-		engine.entityList.push_back(item);
-		engine.inactiveEntities.push_back(item);
-	}
+	shared_ptr<Entity> item;
+	try { item = engine.itemTemplates.at(itemName)->clone(); }
+	catch(std::out_of_range) { return; }
+	item->x = x;
+	item->y = y;
+	engine.entityList.push_back(item);
+	engine.inactiveEntities.push_back(item);
 }
 
 void Map::generateFeature(Rectangle * bounds) {
