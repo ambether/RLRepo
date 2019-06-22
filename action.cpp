@@ -14,9 +14,9 @@ Action::ActionResult MoveAction::execute() {
 					if(owner != engine.player && ent != engine.player) return ActionResult(std::make_shared<IdleAction>(owner));
 					return ActionResult(std::make_shared<AttackAction>(owner, ent));
 				}
-				else { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
+				else if(owner == engine.player && ent->x == owner->x + dx && ent->y == owner->y + dy) { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
 			}
-			else { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
+			else if(owner == engine.player && ent->x == owner->x + dx && ent->y == owner->y + dy) { engine.ui->message(TCODColor::white, "There is a %s here.", ent->name); }
 		}
 	}
 	if(owner == engine.player) engine.setComputeFov(true);
