@@ -9,4 +9,9 @@ public:
 	void attack(shared_ptr<Entity> attacker, shared_ptr<Entity> target);
 private:
 	TCOD_dice_t damageDice;
+	
+	enum Stance {NONE, LOW, MID, HIGH } stance;
+	static enum StanceComparison { DRAW, A_WIN, B_WIN };
+	static StanceComparison compareStance(Stance stanceA, Stance stanceB);
+	const static StanceComparison stanceTable [4][4];
 };
