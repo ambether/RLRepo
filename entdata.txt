@@ -3,13 +3,14 @@ Entity "Player" {
 	col="255,255,255" // white
 	blocks=true
 	Mortal "player" {
-		hp=30
+		hp=20
 		corpseName="your lifeless corpse"
 	}
 	Combat {
-		dex=1
-		skl=3
-		str=10
+		//dex=1
+		//skl=3
+		//str=10
+		damage="1D3+3" // 4-6
 	}
 	Ai "playerAi" {}
 	Container { size=10 }
@@ -23,15 +24,16 @@ Entity "Gobbo" {
 	col="64,128,64" // desaturated green
 	blocks=true
 	Mortal "npc" {
-		hp=15
+		hp=20
 		corpseName="dead Gobbo"
 	}
 	Combat {
-		dex=1
-		skl=1
-		str=5
+		//dex=1
+		//skl=1
+		//str=5
+		damage="1D2"
 	}
-	Ai "mobAi" { speed=50 }
+	Ai "mobAi" { speed=100 }
 }
 
 Entity "Hobbo" {
@@ -43,11 +45,12 @@ Entity "Hobbo" {
 		corpseName="dead Hobbo"
 	}
 	Combat {
-		dex=4
-		skl=3
-		str=6
+		//dex=4
+		//skl=3
+		//str=6
+		damage="1D2"
 	}
-	Ai "mobAi" { speed=150 }
+	Ai "mobAi" { speed=100 }
 }
 
 Entity "Door" {

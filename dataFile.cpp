@@ -21,9 +21,7 @@ void DataFile::parseEntities() {
 	entityTypeStruct->addStructure(aiTypeStruct); // Add Ai as a substructure to Entity
 
 	TCODParserStruct * combatTypeStruct = parser->newStructure("Combat"); // Init Combat structure
-	combatTypeStruct->addProperty("dex", TCOD_TYPE_INT, true);
-	combatTypeStruct->addProperty("skl", TCOD_TYPE_INT, true);
-	combatTypeStruct->addProperty("str", TCOD_TYPE_INT, true);
+	combatTypeStruct->addProperty("damage", TCOD_TYPE_DICE, true);
 	entityTypeStruct->addStructure(combatTypeStruct); // Add Combat as a substructure to Entity
 
 	TCODParserStruct * mortalTypeStruct = parser->newStructure("Mortal"); // Init Mortal structure
@@ -143,10 +141,8 @@ bool DataFile::EntityParserListener::parserProperty(TCODParser * parser, const c
 	else if(strcmp(name, "speed") == 0) { if(currentEntity->ai) currentEntity->ai->setSpeed(value.i); }
 	
 	// Combat properties
-	else if(strcmp(name, "dex") == 0) { if(currentEntity->combat) currentEntity->combat->setDex(value.i); }
-	else if(strcmp(name, "skl") == 0) { if(currentEntity->combat) currentEntity->combat->setSkl(value.i); }
-	else if(strcmp(name, "str") == 0) { if(currentEntity->combat) currentEntity->combat->setStr(value.i); }
-	
+	else if(strcmp(name, "damage") == 0) { if(currentEntity->combat) currentEntity->combat->setDamageDice(value.dice); }
+
 	// Mortal properties
 	else if(strcmp(name, "hp") == 0) { 
 		if(currentEntity->mortal) { 
